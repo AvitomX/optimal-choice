@@ -13,8 +13,13 @@
     <artifactId>optimal-choice-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <properties>
-
-    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.26</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>
