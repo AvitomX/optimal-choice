@@ -4,7 +4,9 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @RequiredArgsConstructor
@@ -12,6 +14,8 @@ public class Purpose {
 
     private String name;
 
-    private List<String> properties = new ArrayList<String>();
+    private List<OptimizationCriterion> optimizationСriteria = new ArrayList<>();
+
+    private Map<String, Double> purposeRelations = new HashMap<>();
 
 }
