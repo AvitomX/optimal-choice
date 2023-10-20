@@ -1,0 +1,59 @@
+package ru.papapers.optimalchoice.model;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
+import org.hibernate.annotations.Cascade;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Getter
+@Setter
+@EqualsAndHashCode(of = {"id", "criterion", "comparingCriterion", "value"})
+@Entity
+@Table(name ="CRITERION_RELATIONS")
+@EntityListeners(AuditingEntityListener.class)
+public class CriterionRelation {
+
+    public CriterionRelation() {
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name="purpose_id", nullable=false)
+    private Purpose purpose;
+
+    @ManyToOne
+    @Cascade({org.hibernate.annotations.CascadeType.PERSIST, org.hibernate.annotations.CascadeType.MERGE})
+    @JoinColumn(name = "criterion_id")
+    private Criterion criterion;
+
+    @ManyToOne
+    @Cascade({org.hibernate.annotations.CascadeType.PERSIST, org.hibernate.annotations.CascadeType.MERGE})
+    @JoinColumn(name = "comparing_criterion_id")
+    private Criterion comparingCriterion;
+
+    @Column(name = "relation_value")
+    private String value;
+
+    @Version
+    private Integer version;
+
+    @CreatedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDateTime;
+
+    @LastModifiedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedDateTime;
+
+}

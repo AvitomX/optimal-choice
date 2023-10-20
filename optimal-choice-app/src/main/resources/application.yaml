@@ -1,2 +1,31 @@
 server:
   port: 8080
+
+spring:
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: my-psw
+  jpa:
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        generate_statistics: true
+        format_sql: true
+    hibernate:
+      jdbc:
+        lob:
+          non_contextual_creation: true
+          ddl-auto: create
+    show-sql: true
+    generate-ddl: true
+  h2:
+    console.enabled: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        stat: DEBUG
