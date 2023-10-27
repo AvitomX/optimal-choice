@@ -12,6 +12,9 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
+        max_fetch_depth: 3
+        order_inserts: true
+        order_updates: true
         generate_statistics: true
         format_sql: true
     hibernate:

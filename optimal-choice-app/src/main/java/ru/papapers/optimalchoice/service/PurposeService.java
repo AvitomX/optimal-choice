@@ -3,12 +3,13 @@ package ru.papapers.optimalchoice.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.papapers.optimalchoice.domain.PurposeDto;
 import ru.papapers.optimalchoice.mapper.PurposeMapper;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.repository.PurposeRepository;
 
-import javax.transaction.Transactional;
+import javax.persistence.EntityNotFoundException;
 import java.util.UUID;
 
 @Slf4j
@@ -34,8 +35,11 @@ public class PurposeService {
         return purposeRepository.save(purpose);
     }
 
+    @Transactional(readOnly = true)
     public Purpose getOne(UUID id) {
         log.info("Get purpose by id: {}.", id);
-        return purposeRepository.getById(id);
+        return purposeRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Purpose with ID = " + id + " not exists"));
     }
 }
