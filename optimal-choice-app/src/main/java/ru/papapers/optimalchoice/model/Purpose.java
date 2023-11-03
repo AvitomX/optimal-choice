@@ -20,6 +20,7 @@ import java.util.UUID;
         name = "purpose-entity-graph",
         attributeNodes = {
                 @NamedAttributeNode(value = "criterionRelations", subgraph = "criterion-relations-subgraph"),
+                @NamedAttributeNode(value = "subjectRelations", subgraph = "subject-relations-subgraph")
         },
         subgraphs = {
                 @NamedSubgraph(
@@ -27,6 +28,14 @@ import java.util.UUID;
                         attributeNodes = {
                                 @NamedAttributeNode("criterion"),
                                 @NamedAttributeNode("comparingCriterion")
+                        }
+                ),
+                @NamedSubgraph(
+                        name = "subject-relations-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("criterion"),
+                                @NamedAttributeNode("subject"),
+                                @NamedAttributeNode("comparingSubject")
                         }
                 )
         }
@@ -51,6 +60,9 @@ public class Purpose {
 
     @OneToMany(mappedBy="purpose", cascade = CascadeType.ALL)
     private Set<CriterionRelation> criterionRelations = new HashSet<>();
+
+    @OneToMany(mappedBy="purpose", cascade = CascadeType.ALL)
+    private Set<SubjectRelation> subjectRelations = new HashSet<>();
 
     @Version
     private Integer version;

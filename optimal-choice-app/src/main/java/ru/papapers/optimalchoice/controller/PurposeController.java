@@ -33,7 +33,7 @@ public class PurposeController {
         log.info("Request for new purpose creation was accepted.");
         Purpose purpose = purposeService.create(purposeDto);
 
-        return new ResponseEntity<PurposeDto>(purposeMapper.toDto(purpose), HttpStatus.CREATED);
+        return new ResponseEntity<PurposeDto>(purposeMapper.mapToDto(purpose), HttpStatus.CREATED);
     }
 
 
@@ -42,6 +42,6 @@ public class PurposeController {
         log.info("Request for purpose with id: {} was accepted.", id);
         Purpose purpose = purposeService.getOne(id);
 
-        return new ResponseEntity<PurposeDto>(purposeMapper.toDto(purpose), HttpStatus.OK);
+        return new ResponseEntity<PurposeDto>(purposeMapper.mapToDto(purpose), HttpStatus.OK);
     }
 }

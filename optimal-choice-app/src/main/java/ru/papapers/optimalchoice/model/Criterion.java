@@ -1,7 +1,9 @@
 package ru.papapers.optimalchoice.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -27,6 +29,7 @@ public class Criterion {
     @Type(type = "uuid-char")
     private UUID id;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
     @Version

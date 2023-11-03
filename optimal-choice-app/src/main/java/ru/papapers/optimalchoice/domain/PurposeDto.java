@@ -13,4 +13,6 @@ public class PurposeDto {
     private String name;
 
     private Set<CriterionRelationDto> criterionRelations;
+
+    private Set<SubjectRelationDto> subjectRelations;
 }

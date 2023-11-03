@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,13 +16,13 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = {"id", "name"})
+@EqualsAndHashCode(of = {"id", "criterion", "subject", "comparingSubject", "value"})
 @Entity
-@Table(name ="SUBJECTS")
+@Table(name ="SUBJECT_RELATIONS")
 @EntityListeners(AuditingEntityListener.class)
-public class Subject {
+public class SubjectRelation {
 
-    public Subject() {
+    public SubjectRelation() {
     }
 
     @Id
@@ -29,8 +30,26 @@ public class Subject {
     @Type(type = "uuid-char")
     private UUID id;
 
-    @Column(unique = true, nullable = false)
-    private String name;
+    @ManyToOne
+    @JoinColumn(name="purpose_id", nullable=false)
+    private Purpose purpose;
+
+    @ManyToOne
+    @JoinColumn(name = "criterion_id")
+    private Criterion criterion;
+
+    @ManyToOne
+    @Cascade({org.hibernate.annotations.CascadeType.PERSIST, org.hibernate.annotations.CascadeType.MERGE})
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
+    @ManyToOne
+    @Cascade({org.hibernate.annotations.CascadeType.PERSIST, org.hibernate.annotations.CascadeType.MERGE})
+    @JoinColumn(name = "comparing_subject_id")
+    private Subject comparingSubject;
+
+    @Column(name = "relation_value")
+    private String value;
 
     @Version
     private Integer version;

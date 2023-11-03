@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.papapers.optimalchoice.domain.PurposeDto;
-import ru.papapers.optimalchoice.mapper.PurposeMapper;
+import ru.papapers.optimalchoice.model.CriterionRelation;
 import ru.papapers.optimalchoice.model.Purpose;
+import ru.papapers.optimalchoice.model.SubjectRelation;
 import ru.papapers.optimalchoice.repository.PurposeRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -17,22 +20,33 @@ import java.util.UUID;
 public class PurposeService {
 
     private final PurposeRepository purposeRepository;
-    private final PurposeMapper purposeMapper;
+    private final CriterionRelationService criterionRelationService;
+    private final SubjectRelationService subjectRelationService;
 
     @Autowired
     public PurposeService(PurposeRepository purposeRepository,
-                          PurposeMapper purposeMapper) {
+                          CriterionRelationService criterionRelationService,
+                          SubjectRelationService subjectRelationService) {
         this.purposeRepository = purposeRepository;
-        this.purposeMapper = purposeMapper;
+        this.criterionRelationService = criterionRelationService;
+        this.subjectRelationService = subjectRelationService;
     }
 
     @Transactional
     public Purpose create(PurposeDto purposeDto) {
         log.info("Create \"{}\" purpose and save it into DB.", purposeDto.getName());
-        Purpose purpose = purposeMapper.dtoToPurpose(purposeDto);
-        purpose.getCriterionRelations().forEach(criterionRelation -> criterionRelation.setPurpose(purpose));
 
-        return purposeRepository.save(purpose);
+        Purpose purpose = new Purpose();
+        purpose.setName(purposeDto.getName());
+        Purpose purposeFromDB = purposeRepository.save(purpose);
+
+        List<CriterionRelation> criterionRelationsFromDB = criterionRelationService.add(purposeDto.getCriterionRelations(), purposeFromDB);
+        purposeFromDB.setCriterionRelations(new HashSet<>(criterionRelationsFromDB));
+
+        List<SubjectRelation> subjectRelationsFromDB = subjectRelationService.add(purposeDto.getSubjectRelations(), purposeFromDB);
+        purposeFromDB.setSubjectRelations(new HashSet<>(subjectRelationsFromDB));
+
+        return purposeFromDB;
     }
 
     @Transactional(readOnly = true)
