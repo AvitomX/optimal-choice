@@ -1,6 +1,7 @@
 package ru.papapers.optimalchoice.domain;
 
 import lombok.Data;
+import ru.papapers.optimalchoice.model.Estimation;
 
 import java.util.UUID;
 
@@ -13,5 +14,5 @@ public class CriterionRelationDto {
 
     private CriterionDto comparingCriterion;
 
-    private String value;
+    private Estimation estimation;
 }

@@ -44,21 +44,30 @@ public class SubjectRelationService {
 
         log.info("Add {} subject relations for {} purpose", relations.size(), purpose.getName());
         return repository.saveAll(relations.stream()
-                .map(relationDto -> {
-                    SubjectRelation relation = mapper.mapToEntity(relationDto);
-
-                    relation.setPurpose(purpose);
-
-                    String criterionName = relation.getCriterion().getName();
-                    Criterion criterionFromDB = criterionService.getOneByName(criterionName)
-                            .orElseThrow(() -> new EntityNotFoundException("Criterion with name = " + criterionName + " not exists"));
-                    relation.setCriterion(criterionFromDB);
-
-                    relation.setSubject(subjectService.add(relation.getSubject()));
-                    relation.setComparingSubject(subjectService.add(relation.getComparingSubject()));
-
-                    return relation;
-                })
+                .map(relationDto -> create(relationDto, purpose))
                 .collect(Collectors.toList()));
+    }
+
+    @Transactional
+    public SubjectRelation addOne(SubjectRelationDto subjectRelationDto, Purpose purpose) {
+        log.info("Add new subject relation for purpose {}", purpose.getName());
+
+        return repository.save(create(subjectRelationDto, purpose));
+    }
+
+    private SubjectRelation create(SubjectRelationDto dto, Purpose purpose) {
+        SubjectRelation relation = mapper.mapToEntity(dto);
+
+        relation.setPurpose(purpose);
+
+        String criterionName = relation.getCriterion().getName();
+        Criterion criterionFromDB = criterionService.getOneByName(criterionName)
+                .orElseThrow(() -> new EntityNotFoundException("Criterion with name = " + criterionName + " not exists"));
+        relation.setCriterion(criterionFromDB);
+
+        relation.setSubject(subjectService.add(relation.getSubject()));
+        relation.setComparingSubject(subjectService.add(relation.getComparingSubject()));
+
+        return relation;
     }
 }

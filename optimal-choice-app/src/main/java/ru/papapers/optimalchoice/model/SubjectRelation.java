@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = {"id", "criterion", "subject", "comparingSubject", "value"})
+@EqualsAndHashCode(of = {"id", "criterion", "subject", "comparingSubject", "estimation"})
 @Entity
 @Table(name ="SUBJECT_RELATIONS")
 @EntityListeners(AuditingEntityListener.class)
@@ -48,8 +48,8 @@ public class SubjectRelation {
     @JoinColumn(name = "comparing_subject_id")
     private Subject comparingSubject;
 
-    @Column(name = "relation_value")
-    private String value;
+    @Enumerated(EnumType.STRING)
+    private Estimation estimation;
 
     @Version
     private Integer version;

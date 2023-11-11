@@ -4,7 +4,7 @@ server:
 spring:
   datasource:
     driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:file:./opttestdb
     username: sa
     password: my-psw
   jpa:
@@ -21,7 +21,7 @@ spring:
       jdbc:
         lob:
           non_contextual_creation: true
-          ddl-auto: create
+          ddl-auto: update
     show-sql: true
     generate-ddl: true
   h2:

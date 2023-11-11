@@ -1,6 +1,7 @@
 package ru.papapers.optimalchoice.domain;
 
 import lombok.Data;
+import ru.papapers.optimalchoice.model.Estimation;
 
 import java.util.UUID;
 
@@ -15,6 +16,6 @@ public class SubjectRelationDto {
 
     private SubjectDto comparingSubject;
 
-    private String value;
+    private Estimation estimation;
 
 }
