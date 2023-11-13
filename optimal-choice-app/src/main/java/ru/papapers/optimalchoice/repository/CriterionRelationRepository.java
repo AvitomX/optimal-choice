@@ -21,7 +21,7 @@ public interface CriterionRelationRepository extends JpaRepository<CriterionRela
     @EntityGraph(attributePaths = { "comparingCriterion, criterion" })
     List<CriterionRelation> findByPurpose(Purpose purpose);
 
-    @EntityGraph(attributePaths = { "comparingCriterion, criterion" })
-    List<CriterionRelation> findByCriterionAndComparingCriterion(Criterion criterion, Criterion comparingCriterion);
+
+    List<CriterionRelation> findByPurposeAndCriterionAndComparingCriterion(Purpose purpose, Criterion criterion, Criterion comparingCriterion);
 
 }

@@ -57,13 +57,10 @@ public class CriterionRelationService {
         Criterion criterionFromDB = criterionService.add(relation.getCriterion());
         Criterion comparingCriterionFromDB = criterionService.add(relation.getComparingCriterion());
 
-        Optional<CriterionRelation> relationOptional = criterionRelationRepository.findByPurpose(purpose)
-                .stream()
-                .filter(r -> doesExist(r, criterionFromDB.getName(), comparingCriterionFromDB.getName()))
-                .findFirst();
 
-        if (relationOptional.isPresent()) {
-            CriterionRelation relationFromDB = relationOptional.get();
+        Optional<CriterionRelation> relationOptionalFromDB = getFromDB(purpose, criterionFromDB, comparingCriterionFromDB);
+        if (relationOptionalFromDB.isPresent()) {
+            CriterionRelation relationFromDB = relationOptionalFromDB.get();
             relationFromDB.setEstimation(relation.getEstimation());
 
             return relationFromDB;
@@ -75,30 +72,19 @@ public class CriterionRelationService {
         }
     }
 
-    private boolean doesExist(CriterionRelation criterionRelation,
-                              String criterionName,
-                              String comparingCriterionName) {
+    private Optional<CriterionRelation> getFromDB(Purpose purpose, Criterion criterion, Criterion comparingCriterion) {
+        Optional<CriterionRelation> relationOptional = criterionRelationRepository
+                .findByPurposeAndCriterionAndComparingCriterion(purpose, criterion, comparingCriterion)
+                .stream()
+                .findFirst();
 
-        Criterion currentCriterion = criterionRelation.getCriterion();
-        if (Objects.isNull(currentCriterion)) {
-            return false;
+        if (relationOptional.isPresent()) {
+            return relationOptional;
+        } else {
+            return criterionRelationRepository
+                    .findByPurposeAndCriterionAndComparingCriterion(purpose, comparingCriterion, criterion)
+                    .stream()
+                    .findFirst();
         }
-
-        Criterion currentComparingCriterion = criterionRelation.getComparingCriterion();
-        if (Objects.isNull(currentComparingCriterion)) {
-            return false;
-        }
-
-        if (criterionName.equals(currentCriterion.getName()) &&
-                comparingCriterionName.equals(currentComparingCriterion.getName())) {
-            return true;
-        }
-
-        if (criterionName.equals(currentComparingCriterion.getName()) &&
-                comparingCriterionName.equals(currentCriterion.getName())) {
-            return true;
-        }
-
-        return false;
     }
 }
