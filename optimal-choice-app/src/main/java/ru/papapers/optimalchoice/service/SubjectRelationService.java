@@ -7,14 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.papapers.optimalchoice.domain.SubjectRelationDto;
 import ru.papapers.optimalchoice.mapper.SubjectRelationMapper;
-import ru.papapers.optimalchoice.model.Criterion;
-import ru.papapers.optimalchoice.model.Purpose;
-import ru.papapers.optimalchoice.model.SubjectRelation;
+import ru.papapers.optimalchoice.model.*;
 import ru.papapers.optimalchoice.repository.SubjectRelationRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,6 +67,35 @@ public class SubjectRelationService {
         relation.setSubject(subjectService.add(relation.getSubject()));
         relation.setComparingSubject(subjectService.add(relation.getComparingSubject()));
 
+        Optional<SubjectRelation> relationOptionalFromDB = getFromDB(relation);
+        if (relationOptionalFromDB.isPresent()) {
+            SubjectRelation subjectRelationFromDB = relationOptionalFromDB.get();
+            subjectRelationFromDB.setEstimation(relation.getEstimation());
+
+            return subjectRelationFromDB;
+        }
+
         return relation;
+    }
+
+    private Optional<SubjectRelation> getFromDB(SubjectRelation relation) {
+        Purpose purpose = relation.getPurpose();
+        Criterion criterion = relation.getCriterion();
+        Subject subject = relation.getSubject();
+        Subject comparingSubject = relation.getComparingSubject();
+
+        Optional<SubjectRelation> relationOptional = repository
+                .findByPurposeAndCriterionAndSubjectAndComparingSubject(purpose, criterion, subject, comparingSubject)
+                .stream()
+                .findFirst();
+
+        if (relationOptional.isPresent()) {
+            return relationOptional;
+        } else {
+            return repository
+                    .findByPurposeAndCriterionAndSubjectAndComparingSubject(purpose, criterion, comparingSubject, subject)
+                    .stream()
+                    .findFirst();
+        }
     }
 }
