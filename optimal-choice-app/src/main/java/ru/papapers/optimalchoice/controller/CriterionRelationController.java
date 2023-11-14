@@ -13,6 +13,7 @@ import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.service.CriterionRelationService;
 import ru.papapers.optimalchoice.service.PurposeService;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @Slf4j
@@ -35,7 +36,7 @@ public class CriterionRelationController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CriterionRelationDto> create(@RequestParam(value = "purpose-id") UUID purposeId,
-                                                       @RequestBody CriterionRelationDto criterionRelationDto) {
+                                                       @Valid @RequestBody CriterionRelationDto criterionRelationDto) {
         log.info("Request for creation of new criterion relation was accepted.");
 
         Purpose purpose = purposeService.getOne(purposeId);

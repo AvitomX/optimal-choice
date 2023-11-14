@@ -13,6 +13,7 @@ import ru.papapers.optimalchoice.model.SubjectRelation;
 import ru.papapers.optimalchoice.service.PurposeService;
 import ru.papapers.optimalchoice.service.SubjectRelationService;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @Slf4j
@@ -34,7 +35,7 @@ public class SubjectRelationController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SubjectRelationDto> create(@RequestParam(value = "purpose-id") UUID purposeId,
-                                                     @RequestBody SubjectRelationDto subjectRelationDto) {
+                                                     @Valid @RequestBody SubjectRelationDto subjectRelationDto) {
         log.info("Request for creation of new subject relation was accepted.");
 
         Purpose purpose = purposeService.getOne(purposeId);

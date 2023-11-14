@@ -11,6 +11,7 @@ import ru.papapers.optimalchoice.mapper.PurposeMapper;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.service.PurposeService;
 
+import javax.validation.Valid;
 import java.util.UUID;
 
 @Slf4j
@@ -18,7 +19,7 @@ import java.util.UUID;
 @RequestMapping("/purpose")
 public class PurposeController {
     private final PurposeService purposeService;
-    private final PurposeMapper  purposeMapper;
+    private final PurposeMapper purposeMapper;
 
     @Autowired
     public PurposeController(PurposeService purposeService,
@@ -29,7 +30,7 @@ public class PurposeController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PurposeDto> create(@RequestBody PurposeDto purposeDto) {
+    public ResponseEntity<PurposeDto> create(@Valid @RequestBody PurposeDto purposeDto) {
         log.info("Request for new purpose creation was accepted.");
         Purpose purpose = purposeService.create(purposeDto);
 
