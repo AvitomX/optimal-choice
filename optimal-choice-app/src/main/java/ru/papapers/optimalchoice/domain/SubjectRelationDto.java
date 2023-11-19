@@ -5,10 +5,11 @@ import ru.papapers.optimalchoice.model.Estimation;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
-public class SubjectRelationDto {
+public class SubjectRelationDto implements Serializable {
 
     private UUID id;
 
