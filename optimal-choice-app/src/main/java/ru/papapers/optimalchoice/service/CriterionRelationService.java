@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.papapers.optimalchoice.domain.CriterionRelationDto;
+import ru.papapers.optimalchoice.domain.errors.ApiError;
 import ru.papapers.optimalchoice.mapper.CriterionRelationMapper;
 import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.model.CriterionRelation;
@@ -14,6 +15,9 @@ import ru.papapers.optimalchoice.repository.CriterionRelationRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.function.Predicate.not;
 
 @Service
 @Slf4j
@@ -48,6 +52,51 @@ public class CriterionRelationService {
         CriterionRelation relation = create(relationDto, purpose);
 
         return criterionRelationRepository.save(relation);
+    }
+
+    public List<ApiError> check(Set<CriterionRelation> criterionRelations) {
+        List<ApiError> apiErrors = new ArrayList<>();
+
+        Stream<Criterion> criterionStream = criterionRelations.stream().map(CriterionRelation::getCriterion);
+        Stream<Criterion> comparingCriterionStream = criterionRelations.stream().map(CriterionRelation::getComparingCriterion);
+        List<Criterion> criteria = Stream.concat(criterionStream, comparingCriterionStream).distinct().collect(Collectors.toList());
+
+        List<CriterionRelation> unchecked = new ArrayList<>(criterionRelations);
+        Set<CriterionRelation> checked = new HashSet<>();
+        for (int i = 0; i < criteria.size(); i++) {
+            Criterion currentCriterion = criteria.get(i);
+
+            for (CriterionRelation relation : unchecked) {
+                Criterion criterion = relation.getCriterion();
+                Criterion comparingCriterion = relation.getComparingCriterion();
+
+                if (currentCriterion.equals(criterion) && !currentCriterion.equals(comparingCriterion)) {
+                    checked.add(relation);
+                } else if (currentCriterion.equals(comparingCriterion) && !currentCriterion.equals(criterion)) {
+                    checked.add(relation);
+                } else if (currentCriterion.equals(comparingCriterion) && currentCriterion.equals(criterion)) {
+                    ApiError error = ApiError.builder()
+                            .errorObject(mapper.mapToDto(relation))
+                            .message("Criterion must not equal comparingCriterion.")
+                            .build();
+                    log.error("{} {}", error.getMessage(), error.getErrorObject());
+                    apiErrors.add(error);
+                }
+            }
+
+            unchecked = unchecked.stream()
+                    .filter(not(checked::contains))
+                    .collect(Collectors.toList());
+
+            if (checked.size() != criteria.size() - i - 1) {
+                apiErrors.add(criterionService.createCriterionError(currentCriterion,
+                        "Need to compare criterion with every other one."));
+            }
+
+            checked.clear();
+        }
+
+        return apiErrors;
     }
 
     private CriterionRelation create(CriterionRelationDto relationDto, Purpose purpose) {
