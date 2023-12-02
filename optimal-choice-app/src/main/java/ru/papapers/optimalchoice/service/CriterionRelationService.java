@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import ru.papapers.optimalchoice.domain.CriterionRelationDto;
-import ru.papapers.optimalchoice.domain.errors.ApiError;
 import ru.papapers.optimalchoice.mapper.CriterionRelationMapper;
 import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.model.CriterionRelation;
@@ -15,9 +14,8 @@ import ru.papapers.optimalchoice.repository.CriterionRelationRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.util.function.Predicate.not;
+import static ru.papapers.optimalchoice.domain.errors.ErrorCode.CRITERION_COMPARING_ERROR;
 
 @Service
 @Slf4j
@@ -54,49 +52,28 @@ public class CriterionRelationService {
         return criterionRelationRepository.save(relation);
     }
 
-    public List<ApiError> check(Set<CriterionRelation> criterionRelations) {
-        List<ApiError> apiErrors = new ArrayList<>();
+    public List<Object> check(Set<CriterionRelation> criterionRelations) {
+        List<Object> errors = new ArrayList<>();
 
-        Stream<Criterion> criterionStream = criterionRelations.stream().map(CriterionRelation::getCriterion);
-        Stream<Criterion> comparingCriterionStream = criterionRelations.stream().map(CriterionRelation::getComparingCriterion);
-        List<Criterion> criteria = Stream.concat(criterionStream, comparingCriterionStream).distinct().collect(Collectors.toList());
+        Set<Criterion> purposeCriteria = new HashSet<>();
+        List<Criterion> comparingCriteria = new ArrayList<>();
 
-        List<CriterionRelation> unchecked = new ArrayList<>(criterionRelations);
-        Set<CriterionRelation> checked = new HashSet<>();
-        for (int i = 0; i < criteria.size(); i++) {
-            Criterion currentCriterion = criteria.get(i);
+        criterionRelations.forEach(criterionRelation -> {
+            purposeCriteria.add(criterionRelation.getCriterion());
+            purposeCriteria.add(criterionRelation.getComparingCriterion());
 
-            for (CriterionRelation relation : unchecked) {
-                Criterion criterion = relation.getCriterion();
-                Criterion comparingCriterion = relation.getComparingCriterion();
+            comparingCriteria.add(criterionRelation.getCriterion());
+            comparingCriteria.add(criterionRelation.getComparingCriterion());
+        });
 
-                if (currentCriterion.equals(criterion) && !currentCriterion.equals(comparingCriterion)) {
-                    checked.add(relation);
-                } else if (currentCriterion.equals(comparingCriterion) && !currentCriterion.equals(criterion)) {
-                    checked.add(relation);
-                } else if (currentCriterion.equals(comparingCriterion) && currentCriterion.equals(criterion)) {
-                    ApiError error = ApiError.builder()
-                            .errorObject(mapper.mapToDto(relation))
-                            .message("Criterion must not equal comparingCriterion.")
-                            .build();
-                    log.error("{} {}", error.getMessage(), error.getErrorObject());
-                    apiErrors.add(error);
-                }
+        purposeCriteria.forEach(criterion -> {
+            int frequency = Collections.frequency(comparingCriteria, criterion);
+            if (frequency != purposeCriteria.size() - 1) {
+                errors.add(criterionService.createCriterionError(criterion, CRITERION_COMPARING_ERROR));
             }
+        });
 
-            unchecked = unchecked.stream()
-                    .filter(not(checked::contains))
-                    .collect(Collectors.toList());
-
-            if (checked.size() != criteria.size() - i - 1) {
-                apiErrors.add(criterionService.createCriterionError(currentCriterion,
-                        "Need to compare criterion with every other one."));
-            }
-
-            checked.clear();
-        }
-
-        return apiErrors;
+        return errors;
     }
 
     private CriterionRelation create(CriterionRelationDto relationDto, Purpose purpose) {

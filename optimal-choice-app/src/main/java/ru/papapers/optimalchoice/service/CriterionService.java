@@ -4,7 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.papapers.optimalchoice.domain.errors.ApiError;
+import ru.papapers.optimalchoice.domain.errors.CriterionError;
+import ru.papapers.optimalchoice.domain.errors.ErrorCode;
 import ru.papapers.optimalchoice.mapper.CriterionMapper;
 import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.repository.CriterionRepository;
@@ -40,13 +41,13 @@ public class CriterionService {
         return criterionRepository.findByName(name);
     }
 
-    public ApiError createCriterionError(Criterion criterion, String message) {
-        ApiError error = ApiError.builder()
-                .errorObject(mapper.mapToDto(criterion))
-                .message(message)
-                .build();
-        log.error("{} {}", error.getMessage(), error.getErrorObject());
+    public CriterionError createCriterionError(Criterion criterion, ErrorCode errorCode) {
+        CriterionError criterionError = new CriterionError(errorCode.getCode(),
+                errorCode.getMessage(),
+                mapper.mapToDto(criterion));
 
-        return error;
+        log.error("{}", criterionError);
+
+        return criterionError;
     }
 }

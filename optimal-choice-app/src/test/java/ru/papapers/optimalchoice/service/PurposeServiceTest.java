@@ -6,15 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.model.CriterionRelation;
-import ru.papapers.optimalchoice.model.Estimation;
 import ru.papapers.optimalchoice.model.Purpose;
+import ru.papapers.optimalchoice.model.SubjectRelation;
 import ru.papapers.optimalchoice.repository.PurposeRepository;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class PurposeServiceTest {
@@ -29,6 +31,7 @@ class PurposeServiceTest {
     @InjectMocks
     private PurposeService purposeService;
 
+
     @BeforeEach
     void setUp() {
     }
@@ -42,80 +45,20 @@ class PurposeServiceTest {
     }
 
     @Test
-    void checkSuccessTest() {
+    void checkTest() {
         Purpose purpose = new Purpose();
         purpose.setId(UUID.randomUUID());
         purpose.setName("testName");
 
         Set<CriterionRelation> criterionRelations = new HashSet<>();
-
-        criterionRelations.add(buildCriterionRelation(purpose, "name_1", "name_2", Estimation.TWO));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_1", "name_3", Estimation.THREE));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_1", "name_4", Estimation.FOUR));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_2", "name_3", Estimation.FIVE));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_2", "name_4", Estimation.SIX));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_3", "name_4", Estimation.SEVEN));
-
         purpose.setCriterionRelations(criterionRelations);
-        purpose.setSubjectRelations(null);
+
+        Set<SubjectRelation> subjectRelations = new HashSet<>();
+        purpose.setSubjectRelations(subjectRelations);
 
         purposeService.check(purpose);
 
-    }
-
-    @Test
-    void checkWhenThereIsNoOneCriterionRelationTest() {
-        Purpose purpose = new Purpose();
-        purpose.setId(UUID.randomUUID());
-        purpose.setName("testName");
-
-        Set<CriterionRelation> criterionRelations = new HashSet<>();
-
-        criterionRelations.add(buildCriterionRelation(purpose, "name_1", "name_3", Estimation.THREE));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_1", "name_4", Estimation.FOUR));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_2", "name_3", Estimation.FIVE));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_2", "name_4", Estimation.SIX));
-        criterionRelations.add(buildCriterionRelation(purpose, "name_3", "name_4", Estimation.SEVEN));
-
-        purpose.setCriterionRelations(criterionRelations);
-        purpose.setSubjectRelations(null);
-
-        purposeService.check(purpose);
-
-    }
-
-    private static final Map<String, Criterion> CRITERION_MAP = new HashMap<>();
-
-    private static CriterionRelation buildCriterionRelation(Purpose purpose,
-                                                          String criterionName,
-                                                          String comparingCriterionName,
-                                                          Estimation estimation) {
-        CriterionRelation criterionRelation = new CriterionRelation();
-
-        criterionRelation.setId(UUID.randomUUID());
-        criterionRelation.setPurpose(purpose);
-
-        criterionRelation.setCriterion(getCriterion(criterionName));
-        criterionRelation.setComparingCriterion(getCriterion(comparingCriterionName));
-
-        criterionRelation.setEstimation(estimation);
-
-        return criterionRelation;
-    }
-
-    private static Criterion getCriterion(String criterionName) {
-        Criterion criterionFromMap = CRITERION_MAP.get(criterionName);
-
-        if (criterionFromMap == null) {
-            Criterion criterion = new Criterion();
-            criterion.setId(UUID.randomUUID());
-            criterion.setName(criterionName);
-
-            CRITERION_MAP.put(criterionName, criterion);
-
-            return criterion;
-        } else {
-            return criterionFromMap;
-        }
+        verify(criterionRelationService, times(1)).check(criterionRelations);
+        verify(subjectRelationService, times(1)).check(subjectRelations);
     }
 }

@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.papapers.optimalchoice.domain.PurposeDto;
-import ru.papapers.optimalchoice.domain.errors.ApiError;
 import ru.papapers.optimalchoice.model.CriterionRelation;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.model.SubjectRelation;
@@ -14,6 +13,7 @@ import ru.papapers.optimalchoice.repository.PurposeRepository;
 import javax.persistence.EntityNotFoundException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -58,9 +58,15 @@ public class PurposeService {
                 .orElseThrow(() -> new EntityNotFoundException("Purpose with ID = " + id + " not exists"));
     }
 
-    public void check(Purpose purpose) {
-        List<ApiError> criterionApiErrors = criterionRelationService.check(purpose.getCriterionRelations());
+    public List<Object> check(Purpose purpose) {
+        Set<CriterionRelation> criterionRelations = purpose.getCriterionRelations();
+        List<Object> errors = criterionRelationService.check(criterionRelations);
 
+        Set<SubjectRelation> subjectRelations = purpose.getSubjectRelations();
+        List<Object> subjectApiErrors = subjectRelationService.check(subjectRelations);
 
+        errors.addAll(subjectApiErrors);
+
+        return errors;
     }
 }

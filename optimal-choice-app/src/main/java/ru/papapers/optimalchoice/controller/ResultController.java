@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.papapers.optimalchoice.domain.PurposeDto;
+import ru.papapers.optimalchoice.domain.Result;
 import ru.papapers.optimalchoice.service.ResultService;
 
 import java.util.UUID;
@@ -25,10 +27,10 @@ public class ResultController {
     }
 
     @GetMapping(value = "/result", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PurposeDto> getResult(@RequestParam(value = "purpose-id") UUID purposeId) {
+    public ResponseEntity<Result> getResult(@RequestParam(value = "purpose-id") UUID purposeId) {
         log.info("Result request with id: {}  was accepted.", purposeId);
-        resultService.compute(purposeId);
+        Result result = resultService.compute(purposeId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(result);
     }
 }

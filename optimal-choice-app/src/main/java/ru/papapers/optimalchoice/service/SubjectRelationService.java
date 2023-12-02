@@ -2,6 +2,7 @@ package ru.papapers.optimalchoice.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -11,11 +12,12 @@ import ru.papapers.optimalchoice.model.*;
 import ru.papapers.optimalchoice.repository.SubjectRelationRepository;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static ru.papapers.optimalchoice.domain.errors.ErrorCode.SUBJECT_COMPARING_ERROR;
+import static ru.papapers.optimalchoice.domain.errors.ErrorCode.SUBJECT_RELATIONS_ABSENCE_ERROR;
 
 @Service
 @Slf4j
@@ -97,5 +99,74 @@ public class SubjectRelationService {
                     .stream()
                     .findFirst();
         }
+    }
+
+    public List<Object> check(Set<SubjectRelation> relations) {
+        Set<Criterion> purposeCriteria = getPurposeCriteria(relations);
+        Set<Subject> purposeSubjects = getPurposeSubjects(relations);
+
+        List<Object> errors = checkSubjectRelationCriteria(purposeCriteria, relations);
+
+        Map<Criterion, List<Pair<Subject, Subject>>> map = relations.stream()
+                .collect(Collectors.groupingBy(SubjectRelation::getCriterion,
+                Collectors.mapping(sbjRlt -> Pair.of(sbjRlt.getSubject(), sbjRlt.getComparingSubject()), Collectors.toList())));
+
+        map.forEach((criterion, pairs) -> {
+            List<Subject> subjects = new ArrayList<>();
+            pairs.forEach(pair -> {
+                subjects.add(pair.getFirst());
+                subjects.add(pair.getSecond());
+            });
+
+            purposeSubjects.forEach(purposeSubject -> {
+                int frequency = Collections.frequency(subjects, purposeSubject);
+                if (frequency != purposeSubjects.size() - 1) {
+                    errors.add(subjectService.createSubjectError(purposeSubject, criterion, SUBJECT_COMPARING_ERROR));
+                }
+            });
+        });
+
+        return errors;
+    }
+
+    private Set<Criterion> getPurposeCriteria(Set<SubjectRelation> subjectRelations) {
+        Set<Criterion> criteriaSet = new HashSet<>();
+
+        SubjectRelation subjectRelation = subjectRelations.iterator().next();
+        Set<CriterionRelation> criterionRelations = subjectRelation.getPurpose().getCriterionRelations();
+
+        criterionRelations.forEach(criterionRelation -> {
+            criteriaSet.add(criterionRelation.getCriterion());
+            criteriaSet.add(criterionRelation.getComparingCriterion());
+        });
+
+        return Collections.unmodifiableSet(criteriaSet) ;
+    }
+
+
+    private Set<Subject> getPurposeSubjects(Set<SubjectRelation> relations) {
+        HashSet<Subject> subjects = new HashSet<>();
+        relations.forEach(subjectRelation -> {
+            subjects.add(subjectRelation.getSubject());
+            subjects.add(subjectRelation.getComparingSubject());
+        });
+
+        return Collections.unmodifiableSet(subjects);
+    }
+
+
+    private List<Object> checkSubjectRelationCriteria(Set<Criterion> criteria, Set<SubjectRelation> relations) {
+        List<Object> errors = new ArrayList<>();
+
+        Set<Criterion> subjectRelationCriteria = relations.stream()
+                .map(SubjectRelation::getCriterion)
+                .collect(Collectors.toSet());
+
+        criteria.stream()
+                .filter(Predicate.not(subjectRelationCriteria::contains))
+                .forEach(criterion ->
+                        errors.add(criterionService.createCriterionError(criterion, SUBJECT_RELATIONS_ABSENCE_ERROR)));
+
+        return errors;
     }
 }

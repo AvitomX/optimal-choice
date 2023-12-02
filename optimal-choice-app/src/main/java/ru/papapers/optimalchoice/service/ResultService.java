@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.papapers.optimalchoice.domain.Result;
 import ru.papapers.optimalchoice.model.Purpose;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -21,9 +22,12 @@ public class ResultService {
 
     public Result compute(UUID purposeId) {
         Purpose purpose = purposeService.getOne(purposeId);
-        purposeService.check(purpose);
-        return null;
 
+        List<Object> errors = purposeService.check(purpose);
+
+        return Result.builder()
+                .errors(errors)
+                .build();
     }
 
 }
