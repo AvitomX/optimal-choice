@@ -6,8 +6,11 @@ import lombok.Getter;
 public enum ErrorCode {
 
     SUBJECT_COMPARING_ERROR("4000", "Need to compare subject with every other one."),
+
     SUBJECT_RELATIONS_ABSENCE_ERROR("4100", "There are no subject relations for this criterion."),
-    CRITERION_COMPARING_ERROR("4101", "Need to compare criterion with every other one.");
+    CRITERION_COMPARING_ERROR("4101", "Need to compare criterion with every other one."),
+
+    CRITERIA_CONSISTENCY_ERROR("4500", "Need to review criteria comparing.");
 
     private final String code;
     private final String message;
