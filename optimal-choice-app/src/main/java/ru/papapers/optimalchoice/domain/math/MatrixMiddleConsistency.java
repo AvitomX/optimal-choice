@@ -1,4 +1,4 @@
-package ru.papapers.optimalchoice.domain;
+package ru.papapers.optimalchoice.domain.math;
 
 import lombok.Getter;
 
