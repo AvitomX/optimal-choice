@@ -91,4 +91,12 @@ public final class DataHelper {
             return criterionFromMap;
         }
     }
+
+    public SubjectRelation buildSubjectRelation(Purpose purpose,
+                                                Criterion criterion,
+                                                Subject subject,
+                                                Subject comparingSubject,
+                                                Estimation estimation) {
+        return buildSubjectRelation(purpose, criterion, subject.getName(), comparingSubject.getName(), estimation);
+    }
 }

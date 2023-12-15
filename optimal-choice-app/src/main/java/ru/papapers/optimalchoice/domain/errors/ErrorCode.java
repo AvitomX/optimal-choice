@@ -10,7 +10,8 @@ public enum ErrorCode {
     SUBJECT_RELATIONS_ABSENCE_ERROR("4100", "There are no subject relations for this criterion."),
     CRITERION_COMPARING_ERROR("4101", "Need to compare criterion with every other one."),
 
-    CRITERIA_CONSISTENCY_ERROR("4500", "Need to review criteria comparing.");
+    CRITERIA_CONSISTENCY_ERROR("4500", "Need to review criteria comparing."),
+    SUBJECT_CONSISTENCY_ERROR("4501", "Need to review subject comparing.");
 
     private final String code;
     private final String message;

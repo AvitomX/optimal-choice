@@ -5,16 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.papapers.optimalchoice.domain.PurposeDto;
-import ru.papapers.optimalchoice.model.CriterionRelation;
-import ru.papapers.optimalchoice.model.Purpose;
-import ru.papapers.optimalchoice.model.SubjectRelation;
+import ru.papapers.optimalchoice.model.*;
 import ru.papapers.optimalchoice.repository.PurposeRepository;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -68,5 +63,25 @@ public class PurposeService {
         errors.addAll(subjectApiErrors);
 
         return errors;
+    }
+
+    public Set<Criterion> getPurposeCriteria(Purpose purpose) {
+        Set<Criterion> criteria = new HashSet<>();
+        purpose.getCriterionRelations().forEach(relation -> {
+            criteria.add(relation.getCriterion());
+            criteria.add(relation.getComparingCriterion());
+        });
+
+        return criteria;
+    }
+
+    public Set<Subject> getPurposeSubject(Purpose purpose) {
+        Set<Subject> subjects = new HashSet<>();
+        purpose.getSubjectRelations().forEach(relation -> {
+            subjects.add(relation.getSubject());
+            subjects.add(relation.getComparingSubject());
+        });
+
+        return subjects;
     }
 }

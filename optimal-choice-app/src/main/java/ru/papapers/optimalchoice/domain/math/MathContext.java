@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.math.RoundingMode.HALF_UP;
+import static java.math.RoundingMode.UP;
 
 public class MathContext {
     public static final double ONE = 1.0;
@@ -37,9 +37,17 @@ public class MathContext {
         return this.nonNormalizeValue;
     }
 
-    public BigDecimal getNormalizeValue(BigDecimal nonNormalizeVectorSum) {
+    public BigDecimal computeNormalizeValue(BigDecimal nonNormalizeVectorSum) {
         if (normalizeValue == null) {
-            this.normalizeValue = getNonNormalizeValue().divide(nonNormalizeVectorSum, SCALE, HALF_UP);
+            this.normalizeValue = getNonNormalizeValue().divide(nonNormalizeVectorSum, SCALE, UP);
+        }
+
+        return this.normalizeValue;
+    }
+
+    public BigDecimal getNormalizeValue() {
+        if (this.normalizeValue == null) {
+            throw new NullPointerException("NormalizeValue is NULL");
         }
 
         return this.normalizeValue;
