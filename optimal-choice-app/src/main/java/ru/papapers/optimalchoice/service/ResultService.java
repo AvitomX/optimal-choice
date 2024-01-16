@@ -41,89 +41,11 @@ public class ResultService {
         Purpose purpose = purposeService.getOne(purposeId);
 
         List<Object> errors = purposeService.check(purpose);
+        Map<Subject, BigDecimal> subjectPriorities = new HashMap<>();
         if (CollectionUtils.isEmpty(errors)) {
-            Set<CriterionRelation> criterionRelations = purpose.getCriterionRelations();
-            Set<Criterion> purposeCriteria = Collections.unmodifiableSet(purposeService.getPurposeCriteria(purpose));
+            Map<Criterion, Vector> criterionVectorMap = getCriterionVectors(purpose, errors);
+            Map<Subject, Set<Pair<Criterion, BigDecimal>>> subjectVectorMap = getSubjectVectors(purpose, criterionVectorMap, errors);
 
-            int criterionCount = purposeCriteria.size();
-            Map<Criterion, Vector> criterionVectorMap = new HashMap<>();
-            purposeCriteria.forEach(criterion -> {
-                Vector vector = new Vector(criterion, criterionCount);
-                MathContext context = vector.getContext();
-                criterionRelations.forEach(relation -> {
-                    if (criterion.equals(relation.getCriterion())) {
-                        context.addRowValue(relation.getEstimation().getDirectValue());
-                        context.addColumnValue(relation.getEstimation().getReverseValue());
-                    }
-                    if (criterion.equals(relation.getComparingCriterion())) {
-                        context.addRowValue(relation.getEstimation().getReverseValue());
-                        context.addColumnValue(relation.getEstimation().getDirectValue());
-                    }
-                });
-
-                criterionVectorMap.put(vector.getCriterion(), vector);
-            });
-
-            List<MathContext> contextList = criterionVectorMap.values().stream()
-                    .map(Vector::getContext)
-                    .collect(Collectors.toList());
-            BigDecimal criterionConsistencyRelation = getConsistencyRelation(contextList, criterionCount);
-
-            if (criterionConsistencyRelation.compareTo(BigDecimal.valueOf(20)) > 0) {
-                ComputationError error = new ComputationError(ErrorCode.CRITERIA_CONSISTENCY_ERROR.getCode(),
-                        ErrorCode.CRITERIA_CONSISTENCY_ERROR.getMessage());
-                errors.add(error);
-            }
-
-
-            Set<Subject> purposeSubject = Collections.unmodifiableSet(purposeService.getPurposeSubject(purpose));
-            Map<Criterion, List<SubjectRelation>> criterionListMap = purpose.getSubjectRelations().stream()
-                    .collect(groupingBy(SubjectRelation::getCriterion));
-
-            criterionListMap.forEach((criterion, subjectRelations) -> {
-                Vector vector = criterionVectorMap.get(criterion);
-                purposeSubject.forEach(subject -> {
-                    MathContext context = new MathContext(purposeSubject.size());
-                    subjectRelations.forEach(relation -> {
-                        if (subject.equals(relation.getSubject())) {
-                            context.addRowValue(relation.getEstimation().getDirectValue());
-                            context.addColumnValue(relation.getEstimation().getReverseValue());
-                        }
-                        if (subject.equals(relation.getComparingSubject())) {
-                            context.addRowValue(relation.getEstimation().getReverseValue());
-                            context.addColumnValue(relation.getEstimation().getDirectValue());
-                        }
-                    });
-                    vector.addSubjectContext(subject, context);
-                });
-            });
-
-            Map<Subject, Set<Pair<Criterion, BigDecimal>>> subjectVectorMap = new HashMap<>();
-            criterionVectorMap.values().forEach(vector -> {
-                List<MathContext> contexts = new ArrayList<>(vector.getSubjectContextMap().values());
-                BigDecimal subjectConsistencyRelation = getConsistencyRelation(contexts, purposeSubject.size());
-                if (subjectConsistencyRelation.compareTo(BigDecimal.valueOf(20)) > 0) {
-                    ComputationError error = new SubjectComputationError(
-                            ErrorCode.SUBJECT_CONSISTENCY_ERROR.getCode(),
-                            ErrorCode.SUBJECT_CONSISTENCY_ERROR.getMessage(),
-                            criterionMapper.mapToDto(vector.getCriterion())
-                    );
-                    errors.add(error);
-                }
-
-                vector.getSubjectContextMap().forEach((subject, context) -> {
-                    Set<Pair<Criterion, BigDecimal>> pairs = subjectVectorMap.get(subject);
-                    if (pairs == null) {
-                        pairs = new HashSet<>();
-                        pairs.add(Pair.of(vector.getCriterion(), context.getNormalizeValue()));
-                        subjectVectorMap.put(subject, pairs);
-                    } else {
-                        pairs.add(Pair.of(vector.getCriterion(), context.getNormalizeValue()));
-                    }
-                });
-            });
-
-            Map<Subject, BigDecimal> priorityList = new HashMap<>();
             subjectVectorMap.forEach((subject, pairs) -> {
                 BigDecimal priority = pairs.stream()
                         .map(pair -> {
@@ -134,16 +56,104 @@ public class ResultService {
                         .reduce(BigDecimal::add)
                         .orElseThrow(RuntimeException::new);//TODO
 
-                priorityList.put(subject, priority);
+                subjectPriorities.put(subject, priority);
             });
-
-
-            System.out.println();
         }
 
         return Result.builder()
+                .subjectPriorities(subjectPriorities)
                 .errors(errors)
                 .build();
+    }
+
+    private Map<Criterion, Vector> getCriterionVectors(Purpose purpose, List<Object> errors) {
+        Set<CriterionRelation> criterionRelations = purpose.getCriterionRelations();
+        Set<Criterion> purposeCriteria = Collections.unmodifiableSet(purposeService.getPurposeCriteria(purpose));
+        Map<Criterion, Vector> criterionVectorMap = new HashMap<>();
+        int criterionCount = purposeCriteria.size();
+
+        purposeCriteria.forEach(criterion -> {
+            Vector vector = new Vector(criterion, criterionCount);
+            MathContext context = vector.getContext();
+            criterionRelations.forEach(relation -> {
+                if (criterion.equals(relation.getCriterion())) {
+                    context.addRowValue(relation.getEstimation().getDirectValue());
+                    context.addColumnValue(relation.getEstimation().getReverseValue());
+                }
+                if (criterion.equals(relation.getComparingCriterion())) {
+                    context.addRowValue(relation.getEstimation().getReverseValue());
+                    context.addColumnValue(relation.getEstimation().getDirectValue());
+                }
+            });
+
+            criterionVectorMap.put(vector.getCriterion(), vector);
+        });
+
+        List<MathContext> contextList = criterionVectorMap.values().stream()
+                .map(Vector::getContext)
+                .collect(Collectors.toList());
+        BigDecimal criterionConsistencyRelation = getConsistencyRelation(contextList, criterionCount);
+
+        if (criterionConsistencyRelation.compareTo(BigDecimal.valueOf(20)) > 0) {
+            ComputationError error = new ComputationError(ErrorCode.CRITERIA_CONSISTENCY_ERROR.getCode(),
+                    ErrorCode.CRITERIA_CONSISTENCY_ERROR.getMessage());
+            errors.add(error);
+        }
+
+        return criterionVectorMap;
+    }
+
+    private Map<Subject, Set<Pair<Criterion, BigDecimal>>> getSubjectVectors(Purpose purpose,
+                                                                             Map<Criterion, Vector> criterionVectorMap,
+                                                                             List<Object> errors) {
+        Set<Subject> purposeSubject = Collections.unmodifiableSet(purposeService.getPurposeSubject(purpose));
+        Map<Criterion, List<SubjectRelation>> criterionListMap = purpose.getSubjectRelations().stream()
+                .collect(groupingBy(SubjectRelation::getCriterion));
+
+        criterionListMap.forEach((criterion, subjectRelations) -> {
+            Vector vector = criterionVectorMap.get(criterion);
+            purposeSubject.forEach(subject -> {
+                MathContext context = new MathContext(purposeSubject.size());
+                subjectRelations.forEach(relation -> {
+                    if (subject.equals(relation.getSubject())) {
+                        context.addRowValue(relation.getEstimation().getDirectValue());
+                        context.addColumnValue(relation.getEstimation().getReverseValue());
+                    }
+                    if (subject.equals(relation.getComparingSubject())) {
+                        context.addRowValue(relation.getEstimation().getReverseValue());
+                        context.addColumnValue(relation.getEstimation().getDirectValue());
+                    }
+                });
+                vector.addSubjectContext(subject, context);
+            });
+        });
+
+        Map<Subject, Set<Pair<Criterion, BigDecimal>>> subjectVectorMap = new HashMap<>();
+        criterionVectorMap.values().forEach(vector -> {
+            List<MathContext> contexts = new ArrayList<>(vector.getSubjectContextMap().values());
+            BigDecimal subjectConsistencyRelation = getConsistencyRelation(contexts, purposeSubject.size());
+            if (subjectConsistencyRelation.compareTo(BigDecimal.valueOf(20)) > 0) {
+                ComputationError error = new SubjectComputationError(
+                        ErrorCode.SUBJECT_CONSISTENCY_ERROR.getCode(),
+                        ErrorCode.SUBJECT_CONSISTENCY_ERROR.getMessage(),
+                        criterionMapper.mapToDto(vector.getCriterion())
+                );
+                errors.add(error);
+            }
+
+            vector.getSubjectContextMap().forEach((subject, context) -> {
+                Set<Pair<Criterion, BigDecimal>> pairs = subjectVectorMap.get(subject);
+                if (pairs == null) {
+                    pairs = new HashSet<>();
+                    pairs.add(Pair.of(vector.getCriterion(), context.getNormalizeValue()));
+                    subjectVectorMap.put(subject, pairs);
+                } else {
+                    pairs.add(Pair.of(vector.getCriterion(), context.getNormalizeValue()));
+                }
+            });
+        });
+
+        return subjectVectorMap;
     }
 
     private BigDecimal getConsistencyRelation(List<MathContext> contextList, int objectCount) {

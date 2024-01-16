@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 
 @Getter
 public enum MatrixMiddleConsistency {
-    ONE(1, BigDecimal.ZERO),
-    TWO(2, BigDecimal.ZERO),
+    ONE(1, BigDecimal.valueOf(0.0000001)),
+    TWO(2, BigDecimal.valueOf(0.0000001)),
     TREE(3, BigDecimal.valueOf(0.58)),
     FOUR(4, BigDecimal.valueOf(0.90)),
     FIVE(5, BigDecimal.valueOf(1.12)),
