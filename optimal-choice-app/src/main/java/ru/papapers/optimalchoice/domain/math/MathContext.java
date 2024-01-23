@@ -56,7 +56,7 @@ public class MathContext {
     public BigDecimal getColumnValueSum() {
         return column.stream()
                 .reduce(BigDecimal::add)
-                .orElseThrow(RuntimeException::new)
-                .add(BigDecimal.ONE); //TODO
+                .orElseThrow(ArithmeticException::new)
+                .add(BigDecimal.ONE);
     }
 }

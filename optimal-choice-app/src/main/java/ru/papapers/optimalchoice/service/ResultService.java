@@ -38,12 +38,14 @@ public class ResultService {
     }
 
     public Result compute(UUID purposeId) {
+        log.info("Сalculation of results has begun. purposeId: {}", purposeId);
         Purpose purpose = purposeService.getOne(purposeId);
 
         List<Object> errors = purposeService.check(purpose);
 
         Map<Subject, BigDecimal> subjectPriorities = new HashMap<>();
         if (CollectionUtils.isEmpty(errors)) {
+            log.info("Purpose was checked successfully. purposeId: {}", purposeId);
             Map<Criterion, Vector> criterionVectorMap = getCriterionVectors(purpose, errors);
             Map<Subject, Set<Pair<Criterion, BigDecimal>>> subjectVectorMap = getSubjectVectors(purpose, criterionVectorMap, errors);
 
@@ -55,10 +57,15 @@ public class ResultService {
                             return pair.getSecond().multiply(criterionNormalizeValue);
                         })
                         .reduce(BigDecimal::add)
-                        .orElseThrow(RuntimeException::new);//TODO
+                        .orElseThrow(() -> {
+                            String msg = String.format("Arithmetic error. purposeId %s, subjectId %s", purpose.getId(), subject.getId());
+                            return new ArithmeticException(msg);
+                        });
 
                 subjectPriorities.put(subject, priority);
             });
+        } else {
+            log.error("Purpose failed the check. purposeId: {}", purposeId);
         }
 
         return Result.builder()
@@ -68,6 +75,7 @@ public class ResultService {
     }
 
     private Map<Criterion, Vector> getCriterionVectors(Purpose purpose, List<Object> errors) {
+        log.info("Сalculation of criterion vectors. purposeId: {}", purpose.getId());
         Set<CriterionRelation> criterionRelations = purpose.getCriterionRelations();
         Set<Criterion> purposeCriteria = Collections.unmodifiableSet(purposeService.getPurposeCriteria(purpose));
         Map<Criterion, Vector> criterionVectorMap = new HashMap<>();
@@ -107,6 +115,7 @@ public class ResultService {
     private Map<Subject, Set<Pair<Criterion, BigDecimal>>> getSubjectVectors(Purpose purpose,
                                                                              Map<Criterion, Vector> criterionVectorMap,
                                                                              List<Object> errors) {
+        log.info("Сalculation of subject vectors. purposeId: {}", purpose.getId());
         Set<Subject> purposeSubject = Collections.unmodifiableSet(purposeService.getPurposeSubject(purpose));
         Map<Criterion, List<SubjectRelation>> criterionListMap = purpose.getSubjectRelations().stream()
                 .collect(groupingBy(SubjectRelation::getCriterion));
@@ -161,7 +170,7 @@ public class ResultService {
         BigDecimal nonNormalizeVectorSum = contextList.stream()
                 .map(MathContext::getNonNormalizeValue)
                 .reduce(BigDecimal::add)
-                .orElseThrow(RuntimeException::new); //TODO
+                .orElseThrow(ArithmeticException::new);
 
         BigDecimal consistencyIndexComponent = contextList.stream()
                 .map(context -> context.computeNormalizeValue(nonNormalizeVectorSum).multiply(context.getColumnValueSum()))
@@ -173,7 +182,9 @@ public class ResultService {
                 .divide(BigDecimal.valueOf(objectCount - 1), SCALE, UP);
 
         BigDecimal middleMatrixConsistency = Objects.requireNonNull(
-                MatrixMiddleConsistency.findByMatrixSize(objectCount)).getConsistency(); //TODO
+                MatrixMiddleConsistency.findByMatrixSize(objectCount),
+                "middleMatrixConsistency can't be NULL"
+        ).getConsistency();
 
         return consistencyIndex
                 .divide(middleMatrixConsistency, SCALE, UP)
