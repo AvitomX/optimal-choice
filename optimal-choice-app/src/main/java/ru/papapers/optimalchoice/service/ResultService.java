@@ -41,6 +41,7 @@ public class ResultService {
         Purpose purpose = purposeService.getOne(purposeId);
 
         List<Object> errors = purposeService.check(purpose);
+
         Map<Subject, BigDecimal> subjectPriorities = new HashMap<>();
         if (CollectionUtils.isEmpty(errors)) {
             Map<Criterion, Vector> criterionVectorMap = getCriterionVectors(purpose, errors);

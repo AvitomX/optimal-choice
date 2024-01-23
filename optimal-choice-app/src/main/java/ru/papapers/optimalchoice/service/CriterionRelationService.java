@@ -16,10 +16,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.papapers.optimalchoice.domain.errors.ErrorCode.CRITERION_COMPARING_ERROR;
+import static ru.papapers.optimalchoice.domain.errors.ErrorCode.CRITERION_COUNT_ERROR;
 
 @Service
 @Slf4j
 public class CriterionRelationService {
+
+    public static final int MIN_CRITERION_COUNT = 2;
 
     private final CriterionRelationRepository criterionRelationRepository;
     private final CriterionService criterionService;
@@ -65,6 +68,11 @@ public class CriterionRelationService {
             comparingCriteria.add(criterionRelation.getCriterion());
             comparingCriteria.add(criterionRelation.getComparingCriterion());
         });
+
+        if (purposeCriteria.size() < MIN_CRITERION_COUNT) {
+            errors.add(criterionService.createCriterionError(null, CRITERION_COUNT_ERROR));
+            return errors;
+        }
 
         purposeCriteria.forEach(criterion -> {
             int frequency = Collections.frequency(comparingCriteria, criterion);

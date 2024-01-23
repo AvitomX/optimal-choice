@@ -1,5 +1,6 @@
 package ru.papapers.optimalchoice.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,10 +12,8 @@ import ru.papapers.optimalchoice.domain.Result;
 import ru.papapers.optimalchoice.mapper.CriterionMapperImpl;
 import ru.papapers.optimalchoice.model.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -146,10 +145,93 @@ class ResultServiceTest {
     void computeTest() {
         doReturn(purpose).when(purposeService).getOne(any());
         doReturn(new ArrayList<>()).when(purposeService).check(any());
-//        when(purposeService.getOne(any())).thenReturn(purpose);
-//        when(purposeService.check(any())).thenReturn(Collections.EMPTY_LIST);
+
+        Result result = resultService.compute(UUID.randomUUID());
+
+        Map<Subject, BigDecimal> actualSubjectPriorities = result.getSubjectPriorities();
+        Assertions.assertFalse(actualSubjectPriorities.isEmpty());
+        Assertions.assertEquals(BigDecimal.valueOf(0.351102957975), actualSubjectPriorities.get(b));
+        Assertions.assertEquals(BigDecimal.valueOf(0.269969403869), actualSubjectPriorities.get(c));
+        Assertions.assertEquals(BigDecimal.valueOf(0.378933945048), actualSubjectPriorities.get(a));
+    }
+
+/*
+    @Test
+    void computeTest2() {
+        Purpose purpose2 = new Purpose();
+        purpose2.setId(UUID.randomUUID());
+        purpose2.setName("Job");
+
+        Criterion money = dataHelper.getCriterion("money");
+        Criterion task = dataHelper.getCriterion("tasks");
+        Criterion transport = dataHelper.getCriterion("transport");
+        Criterion team = dataHelper.getCriterion("team");
+        Criterion medic = dataHelper.getCriterion("medic");
+        Criterion company = dataHelper.getCriterion("company");
+        Criterion bonuses = dataHelper.getCriterion("bonuses");
+        Criterion remote = dataHelper.getCriterion("remote work");
+
+        Set<CriterionRelation> criterionRelations = new HashSet<>();
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, money, task, Estimation.ONE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, money, transport, Estimation.THREE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, money, team, Estimation.THREE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, money, medic, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, money, company, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, money, bonuses, Estimation.SEVEN));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, money, remote, Estimation.SEVEN));
+
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, task, transport, Estimation.THREE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, task, team, Estimation.THREE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, task, medic, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, task, company, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, task, bonuses, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, task, remote, Estimation.FIVE));
+
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, transport, team, Estimation.THREE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, transport, medic, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, transport, company, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, transport, bonuses, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, transport, remote, Estimation.FIVE));
+
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, team, medic, Estimation.THREE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, team, company, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, team, bonuses, Estimation.FIVE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, team, remote, Estimation.FIVE));
+
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, medic, company, Estimation.TWO));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, medic, bonuses, Estimation.THREE));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, medic, remote, Estimation.THREE));
+
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, company, bonuses, Estimation.TWO));
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, company, remote, Estimation.THREE));
+
+        criterionRelations.add(dataHelper.buildCriterionRelation(purpose2, bonuses, remote, Estimation.THREE));
+
+        purpose2.setCriterionRelations(criterionRelations);
+
+
+        Subject green = dataHelper.getSubject("Green");
+        Subject red = dataHelper.getSubject("Red");
+
+        Set<SubjectRelation> subjectRelations = new HashSet<>();
+        subjectRelations.add(dataHelper.buildSubjectRelation(purpose2, money, red, green, Estimation.THREE));
+        subjectRelations.add(dataHelper.buildSubjectRelation(purpose2, task, red, green , Estimation.FOUR));
+        subjectRelations.add(dataHelper.buildSubjectRelation(purpose2, transport, green, red, Estimation.THREE));
+        subjectRelations.add(dataHelper.buildSubjectRelation(purpose2, team, green, red, Estimation.TWO));
+        subjectRelations.add(dataHelper.buildSubjectRelation(purpose2, medic, green, red, Estimation.TWO));
+        subjectRelations.add(dataHelper.buildSubjectRelation(purpose2, company, green, red, Estimation.FIVE));
+        subjectRelations.add(dataHelper.buildSubjectRelation(purpose2, bonuses, green, red, Estimation.FIVE));
+        subjectRelations.add(dataHelper.buildSubjectRelation(purpose2, remote, green, red, Estimation.TWO));
+
+        purpose2.setSubjectRelations(subjectRelations);
+
+
+        doReturn(purpose2).when(purposeService).getOne(any());
+        doReturn(new ArrayList<>()).when(purposeService).check(any());
 
         Result result = resultService.compute(UUID.randomUUID());
 
     }
+ */
+
 }

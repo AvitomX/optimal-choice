@@ -16,12 +16,13 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static ru.papapers.optimalchoice.domain.errors.ErrorCode.SUBJECT_COMPARING_ERROR;
-import static ru.papapers.optimalchoice.domain.errors.ErrorCode.SUBJECT_RELATIONS_ABSENCE_ERROR;
+import static ru.papapers.optimalchoice.domain.errors.ErrorCode.*;
 
 @Service
 @Slf4j
 public class SubjectRelationService {
+
+    public static final int MIN_SUBJECT_COUNT = 2;
 
     private final SubjectRelationRepository repository;
     private final CriterionService criterionService;
@@ -105,7 +106,13 @@ public class SubjectRelationService {
         Set<Criterion> purposeCriteria = getPurposeCriteria(relations);
         Set<Subject> purposeSubjects = getPurposeSubjects(relations);
 
-        List<Object> errors = checkSubjectRelationCriteria(purposeCriteria, relations);
+        List<Object> errors = new ArrayList<>();
+        if (purposeSubjects.size() < MIN_SUBJECT_COUNT) {
+            errors.add(subjectService.createSubjectError(null, null, SUBJECT_COUNT_ERROR));
+            return errors;
+        }
+
+        errors.addAll(checkSubjectRelationCriteria(purposeCriteria, relations)) ;
 
         Map<Criterion, List<Pair<Subject, Subject>>> map = relations.stream()
                 .collect(Collectors.groupingBy(SubjectRelation::getCriterion,
@@ -165,7 +172,7 @@ public class SubjectRelationService {
         criteria.stream()
                 .filter(Predicate.not(subjectRelationCriteria::contains))
                 .forEach(criterion ->
-                        errors.add(criterionService.createCriterionError(criterion, SUBJECT_RELATIONS_ABSENCE_ERROR)));
+                        errors.add(criterionService.createCriterionError(criterion, CRITERION_SUBJECT_RELATIONS_ABSENCE_ERROR)));
 
         return errors;
     }
