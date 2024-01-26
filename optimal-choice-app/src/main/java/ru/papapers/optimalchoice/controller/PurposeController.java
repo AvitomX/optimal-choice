@@ -45,4 +45,20 @@ public class PurposeController {
 
         return new ResponseEntity<>(purposeMapper.mapToDto(purpose), HttpStatus.OK);
     }
+
+    @PutMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PurposeDto> update(@Valid @RequestBody PurposeDto newPurposeDto, @PathVariable("id") UUID id) {
+        log.info("Request for purpose modification with id: {} was accepted.", id);
+        Purpose purpose = purposeService.update(id, newPurposeDto);
+
+        return new ResponseEntity<>(purposeMapper.mapToDto(purpose), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UUID> delete(@PathVariable("id") UUID id) {
+        log.info("Request for purpose deleting with id: {} was accepted.", id);
+        purposeService.delete(id);
+
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
 }

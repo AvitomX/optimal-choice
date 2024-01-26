@@ -84,4 +84,19 @@ public class PurposeService {
 
         return subjects;
     }
+
+    @Transactional
+    public Purpose update(UUID id, PurposeDto newPurposeDto) {
+        Purpose purpose = getOne(id);
+        purpose.setName(newPurposeDto.getName());
+        log.info("Purpose was updated. purposeId: {}", purpose.getId());
+
+        return purpose;
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        purposeRepository.deleteById(id);
+        log.info("Purpose was deleted. purposeId: {}", id);
+    }
 }
