@@ -9,7 +9,10 @@ import ru.papapers.optimalchoice.model.*;
 import ru.papapers.optimalchoice.repository.PurposeRepository;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Service
