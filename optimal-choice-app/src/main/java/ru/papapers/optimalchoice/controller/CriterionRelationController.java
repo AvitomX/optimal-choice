@@ -44,4 +44,20 @@ public class CriterionRelationController {
 
         return new ResponseEntity<>(mapper.mapToDto(criterionRelation), HttpStatus.CREATED);
     }
+
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CriterionRelationDto> update(@Valid @RequestBody CriterionRelationDto criterionRelationDto) {
+        log.info("Request for modification of criterion relation was accepted.");
+        CriterionRelation criterionRelation = criterionRelationService.update(criterionRelationDto);
+
+        return new ResponseEntity<>(mapper.mapToDto(criterionRelation), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UUID> delete(@PathVariable("id") UUID id) {
+        criterionRelationService.delete(id);
+        log.info("Request for criterion relation deleting with id: {} was accepted.", id);
+
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
 }

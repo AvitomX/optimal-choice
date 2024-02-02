@@ -12,6 +12,7 @@ import ru.papapers.optimalchoice.model.CriterionRelation;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.repository.CriterionRelationRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,27 @@ public class CriterionRelationService {
         CriterionRelation relation = create(relationDto, purpose);
 
         return criterionRelationRepository.save(relation);
+    }
+
+    @Transactional
+    public CriterionRelation update(CriterionRelationDto criterionRelationDto) {
+        CriterionRelation relation = mapper.mapToEntity(criterionRelationDto);
+
+        UUID id = relation.getId();
+        CriterionRelation relationFromDB = criterionRelationRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Criterion relation with ID = " + id + " not exists"));
+
+        relationFromDB.setCriterion(criterionService.add(relation.getCriterion()));
+        relationFromDB.setComparingCriterion(criterionService.add(relation.getComparingCriterion()));
+        relationFromDB.setEstimation(criterionRelationDto.getEstimation());
+
+        return relationFromDB;
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        criterionRelationRepository.deleteById(id);
+        log.info("Criterion relation was deleted. criterionRelationId: {}", id);
     }
 
     public List<Object> check(Set<CriterionRelation> criterionRelations) {
@@ -121,4 +143,6 @@ public class CriterionRelationService {
                     .findFirst();
         }
     }
+
+
 }
