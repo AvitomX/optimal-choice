@@ -43,4 +43,20 @@ public class SubjectRelationController {
 
         return new ResponseEntity<>(mapper.mapToDto(subjectRelation), HttpStatus.CREATED);
     }
+
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SubjectRelationDto> update(@Valid @RequestBody SubjectRelationDto subjectRelationDto) {
+        log.info("Request for modification of subject relation was accepted.");
+        SubjectRelation subjectRelation = subjectRelationService.update(subjectRelationDto);
+
+        return new ResponseEntity<>(mapper.mapToDto(subjectRelation), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UUID> delete(@PathVariable("id") UUID id) {
+        subjectRelationService.delete(id);
+        log.info("Request for subject relation deleting with id: {} was accepted.", id);
+
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
 }

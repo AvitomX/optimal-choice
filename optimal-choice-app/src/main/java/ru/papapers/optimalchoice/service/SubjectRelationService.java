@@ -57,6 +57,27 @@ public class SubjectRelationService {
         return repository.save(create(subjectRelationDto, purpose));
     }
 
+    @Transactional
+    public SubjectRelation update(SubjectRelationDto subjectRelationDto) {
+        SubjectRelation relation = mapper.mapToEntity(subjectRelationDto);
+
+        UUID id = relation.getId();
+        SubjectRelation relationFromDB = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subject relation with ID = " + id + " not exists"));
+
+        relationFromDB.setSubject(subjectService.add(relation.getSubject()));
+        relationFromDB.setComparingSubject(subjectService.add(relation.getComparingSubject()));
+        relationFromDB.setEstimation(subjectRelationDto.getEstimation());
+
+        return relationFromDB;
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        repository.deleteById(id);
+        log.info("Subject relation was deleted. SubjectRelationId: {}", id);
+    }
+
     private SubjectRelation create(SubjectRelationDto dto, Purpose purpose) {
         SubjectRelation relation = mapper.mapToEntity(dto);
 
