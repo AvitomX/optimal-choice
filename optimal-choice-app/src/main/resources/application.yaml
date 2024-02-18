@@ -32,3 +32,8 @@ logging:
     org:
       hibernate:
         stat: DEBUG
+
+
+springdoc:
+  api-docs:
+    enabled: true
