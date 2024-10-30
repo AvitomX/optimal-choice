@@ -1,0 +1,7 @@
+@import url('./main-layout.css');
+@import url('./views/purpose-view.css');
+@import url('./views/criterion-view.css');
+@import url('./views/criterion-relations-view.css');
+@import url('./views/subjects-view.css');
+@import url('./views/subject-relations-view.css');
+@import url('./views/result-view.css');
