@@ -1,0 +1,10 @@
+,--.   ,--.,--.   ,--. ,-----.
+|   `.'   ||   `.'   |'  .--./
+|  |'.'|  ||  |'.'|  ||  |
+|  |   |  ||  |   |  |'  '--'\
+`--'   `--'`--'   `--' `-----'
+            from Staraya Russa
+
+${spring.application.name}
+Powered by Spring Boot ${spring-boot.version}
+
