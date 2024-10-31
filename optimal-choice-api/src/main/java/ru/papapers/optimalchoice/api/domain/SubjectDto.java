@@ -1,4 +1,4 @@
-package ru.papapers.optimalchoice.domain;
+package ru.papapers.optimalchoice.api.domain;
 
 import lombok.Data;
 

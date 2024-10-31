@@ -1,19 +1,25 @@
 package ru.papapers.optimalchoice.api.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.UUID;
 
-@Getter
-@AllArgsConstructor
-public class CriterionRelationDto {
+@Data
+public class CriterionRelationDto implements Serializable {
 
     private UUID id;
 
+    @Valid
+    @NotNull
     private CriterionDto criterion;
 
+    @Valid
+    @NotNull
     private CriterionDto comparingCriterion;
 
-    private String value;
+    @NotNull
+    private Estimation estimation;
 }

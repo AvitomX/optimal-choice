@@ -1,7 +1,6 @@
-package ru.papapers.optimalchoice.domain;
+package ru.papapers.optimalchoice.api.domain;
 
 import lombok.Data;
-import ru.papapers.optimalchoice.model.Estimation;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

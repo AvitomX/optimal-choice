@@ -1,18 +1,21 @@
 package ru.papapers.optimalchoice.api.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
-@AllArgsConstructor
-public class PurposeDto {
+@Data
+public class PurposeDto implements Serializable {
 
     private UUID id;
 
+    @NotBlank
     private String name;
 
     private Set<CriterionRelationDto> criterionRelations;
+
+    private Set<SubjectRelationDto> subjectRelations;
 }

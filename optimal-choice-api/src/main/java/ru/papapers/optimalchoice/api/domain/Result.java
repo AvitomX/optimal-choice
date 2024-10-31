@@ -1,8 +1,8 @@
-package ru.papapers.optimalchoice.domain;
+package ru.papapers.optimalchoice.api.domain;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.papapers.optimalchoice.model.Subject;
+
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,7 +13,7 @@ import java.util.Map;
 @Builder
 public class Result implements Serializable {
 
-    private Map<Subject, BigDecimal> subjectPriorities;
+    private Map<SubjectDto, BigDecimal> subjectPriorities;
     private final List<Object> errors;
 
 }
