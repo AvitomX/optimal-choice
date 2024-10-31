@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.papapers.optimalchoice.domain.violations.ValidationErrorResponse;
-import ru.papapers.optimalchoice.domain.violations.Violation;
+import ru.papapers.optimalchoice.api.domain.violations.ValidationErrorResponse;
+import ru.papapers.optimalchoice.api.domain.violations.Violation;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;

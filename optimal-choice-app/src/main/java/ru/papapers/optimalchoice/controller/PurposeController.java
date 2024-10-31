@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.papapers.optimalchoice.domain.PurposeDto;
+import ru.papapers.optimalchoice.api.domain.PurposeDto;
 import ru.papapers.optimalchoice.mapper.PurposeMapper;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.service.PurposeService;

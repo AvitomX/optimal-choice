@@ -8,8 +8,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.papapers.optimalchoice.DataHelper;
-import ru.papapers.optimalchoice.domain.Result;
+import ru.papapers.optimalchoice.api.domain.Estimation;
+import ru.papapers.optimalchoice.api.domain.Result;
+import ru.papapers.optimalchoice.api.domain.SubjectDto;
 import ru.papapers.optimalchoice.mapper.CriterionMapperImpl;
+import ru.papapers.optimalchoice.mapper.SubjectMapper;
+import ru.papapers.optimalchoice.mapper.SubjectMapperImpl;
 import ru.papapers.optimalchoice.model.*;
 
 import java.math.BigDecimal;
@@ -26,6 +30,9 @@ class ResultServiceTest {
 
     @Spy
     private CriterionMapperImpl criterionMapper;
+
+    @Spy
+    private SubjectMapperImpl subjectMapper;
 
     @InjectMocks
     private ResultService resultService;
@@ -148,11 +155,11 @@ class ResultServiceTest {
 
         Result result = resultService.compute(UUID.randomUUID());
 
-        Map<Subject, BigDecimal> actualSubjectPriorities = result.getSubjectPriorities();
+        Map<SubjectDto, BigDecimal> actualSubjectPriorities = result.getSubjectPriorities();
         Assertions.assertFalse(actualSubjectPriorities.isEmpty());
-        Assertions.assertEquals(BigDecimal.valueOf(0.351102957975), actualSubjectPriorities.get(b));
-        Assertions.assertEquals(BigDecimal.valueOf(0.269969403869), actualSubjectPriorities.get(c));
-        Assertions.assertEquals(BigDecimal.valueOf(0.378933945048), actualSubjectPriorities.get(a));
+        Assertions.assertEquals(BigDecimal.valueOf(0.351102957975), actualSubjectPriorities.entrySet().stream().filter(entry -> entry.getKey().getId().equals(b.getId())).findFirst().get().getValue());
+        Assertions.assertEquals(BigDecimal.valueOf(0.269969403869), actualSubjectPriorities.entrySet().stream().filter(entry -> entry.getKey().getId().equals(c.getId())).findFirst().get().getValue());
+        Assertions.assertEquals(BigDecimal.valueOf(0.378933945048), actualSubjectPriorities.entrySet().stream().filter(entry -> entry.getKey().getId().equals(a.getId())).findFirst().get().getValue());
     }
 
 /*

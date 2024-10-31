@@ -1,5 +1,6 @@
 package ru.papapers.optimalchoice;
 
+import ru.papapers.optimalchoice.api.domain.Estimation;
 import ru.papapers.optimalchoice.model.*;
 
 import java.util.HashMap;

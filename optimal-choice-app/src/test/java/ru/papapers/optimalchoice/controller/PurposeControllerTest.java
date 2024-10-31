@@ -2,13 +2,7 @@ package ru.papapers.optimalchoice.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.papapers.optimalchoice.domain.CriterionDto;
-import ru.papapers.optimalchoice.domain.CriterionRelationDto;
-import ru.papapers.optimalchoice.domain.PurposeDto;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 class PurposeControllerTest {
 

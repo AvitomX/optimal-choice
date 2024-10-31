@@ -7,10 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.papapers.optimalchoice.DataHelper;
+import ru.papapers.optimalchoice.api.domain.Estimation;
 import ru.papapers.optimalchoice.mapper.CriterionRelationMapper;
 import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.model.CriterionRelation;
-import ru.papapers.optimalchoice.model.Estimation;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.repository.CriterionRelationRepository;
 
@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static ru.papapers.optimalchoice.domain.errors.ErrorCode.CRITERION_COMPARING_ERROR;
+import static ru.papapers.optimalchoice.api.domain.errors.ErrorCode.CRITERION_COMPARING_ERROR;
 
 @ExtendWith(MockitoExtension.class)
 class CriterionRelationServiceTest {

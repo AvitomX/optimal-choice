@@ -5,14 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import ru.papapers.optimalchoice.domain.Result;
-import ru.papapers.optimalchoice.domain.errors.ComputationError;
-import ru.papapers.optimalchoice.domain.errors.ErrorCode;
-import ru.papapers.optimalchoice.domain.errors.SubjectComputationError;
+import ru.papapers.optimalchoice.api.domain.Result;
+import ru.papapers.optimalchoice.api.domain.SubjectDto;
+import ru.papapers.optimalchoice.api.domain.errors.ComputationError;
+import ru.papapers.optimalchoice.api.domain.errors.ErrorCode;
+import ru.papapers.optimalchoice.api.domain.errors.SubjectComputationError;
 import ru.papapers.optimalchoice.domain.math.MathContext;
 import ru.papapers.optimalchoice.domain.math.MatrixMiddleConsistency;
 import ru.papapers.optimalchoice.domain.math.Vector;
 import ru.papapers.optimalchoice.mapper.CriterionMapper;
+import ru.papapers.optimalchoice.mapper.SubjectMapper;
 import ru.papapers.optimalchoice.model.*;
 
 import java.math.BigDecimal;
@@ -30,11 +32,13 @@ public class ResultService {
 
     private final PurposeService purposeService;
     private final CriterionMapper criterionMapper;
+    private final SubjectMapper subjectMapper;
 
     @Autowired
-    public ResultService(PurposeService purposeService, CriterionMapper criterionMapper) {
+    public ResultService(PurposeService purposeService, CriterionMapper criterionMapper, SubjectMapper subjectMapper) {
         this.purposeService = purposeService;
         this.criterionMapper = criterionMapper;
+        this.subjectMapper = subjectMapper;
     }
 
     public Result compute(UUID purposeId) {
@@ -43,7 +47,7 @@ public class ResultService {
 
         List<Object> errors = purposeService.check(purpose);
 
-        Map<Subject, BigDecimal> subjectPriorities = new HashMap<>();
+        Map<SubjectDto, BigDecimal> subjectPriorities = new HashMap<>();
         if (CollectionUtils.isEmpty(errors)) {
             log.info("Purpose was checked successfully. purposeId: {}", purposeId);
             Map<Criterion, Vector> criterionVectorMap = getCriterionVectors(purpose, errors);
@@ -62,7 +66,7 @@ public class ResultService {
                             return new ArithmeticException(msg);
                         });
 
-                subjectPriorities.put(subject, priority);
+                subjectPriorities.put(subjectMapper.mapToDto(subject), priority);
             });
         } else {
             log.error("Purpose failed the check. purposeId: {}", purposeId);

@@ -5,19 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import ru.papapers.optimalchoice.domain.CriterionRelationDto;
+import ru.papapers.optimalchoice.api.domain.CriterionRelationDto;
 import ru.papapers.optimalchoice.mapper.CriterionRelationMapper;
 import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.model.CriterionRelation;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.repository.CriterionRelationRepository;
+import ru.papapers.optimalchoice.api.domain.errors.ErrorCode;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.papapers.optimalchoice.domain.errors.ErrorCode.CRITERION_COMPARING_ERROR;
-import static ru.papapers.optimalchoice.domain.errors.ErrorCode.CRITERION_COUNT_ERROR;
+import static ru.papapers.optimalchoice.api.domain.errors.ErrorCode.CRITERION_COMPARING_ERROR;
+import static ru.papapers.optimalchoice.api.domain.errors.ErrorCode.CRITERION_COUNT_ERROR;
+
 
 @Service
 @Slf4j

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.papapers.optimalchoice.domain.CriterionRelationDto;
+import ru.papapers.optimalchoice.api.domain.CriterionRelationDto;
 import ru.papapers.optimalchoice.mapper.CriterionRelationMapper;
 import ru.papapers.optimalchoice.model.CriterionRelation;
 import ru.papapers.optimalchoice.model.Purpose;

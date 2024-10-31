@@ -1,7 +1,7 @@
 package ru.papapers.optimalchoice.mapper;
 
 import org.mapstruct.Mapper;
-import ru.papapers.optimalchoice.domain.CriterionDto;
+import ru.papapers.optimalchoice.api.domain.CriterionDto;
 import ru.papapers.optimalchoice.model.Criterion;
 
 @Mapper(componentModel = "spring")

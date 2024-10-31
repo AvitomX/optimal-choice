@@ -6,7 +6,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import ru.papapers.optimalchoice.domain.SubjectRelationDto;
+import ru.papapers.optimalchoice.api.domain.SubjectRelationDto;
 import ru.papapers.optimalchoice.mapper.SubjectRelationMapper;
 import ru.papapers.optimalchoice.model.*;
 import ru.papapers.optimalchoice.repository.SubjectRelationRepository;
@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static ru.papapers.optimalchoice.domain.errors.ErrorCode.*;
+import static ru.papapers.optimalchoice.api.domain.errors.ErrorCode.*;
 
 @Service
 @Slf4j

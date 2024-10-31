@@ -8,7 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.papapers.optimalchoice.DataHelper;
-import ru.papapers.optimalchoice.domain.errors.CriterionError;
+import ru.papapers.optimalchoice.api.domain.Estimation;
+import ru.papapers.optimalchoice.api.domain.errors.CriterionError;
 import ru.papapers.optimalchoice.mapper.SubjectRelationMapper;
 import ru.papapers.optimalchoice.model.*;
 import ru.papapers.optimalchoice.repository.SubjectRelationRepository;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static ru.papapers.optimalchoice.domain.errors.ErrorCode.SUBJECT_COMPARING_ERROR;
+import static ru.papapers.optimalchoice.api.domain.errors.ErrorCode.SUBJECT_COMPARING_ERROR;
 
 @ExtendWith(MockitoExtension.class)
 class SubjectRelationServiceTest {
