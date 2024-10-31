@@ -1,4 +1,4 @@
-package ru.papapers.views;
+package ru.papapers.optimalchoice.ui.views;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -43,7 +43,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addDrawerContent() {
-        Span appName = new Span("Optimal choice");
+        Span appName = new Span("Оптимальный выбор");
         appName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.LARGE);
         Header header = new Header(appName);
 

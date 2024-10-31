@@ -1,4 +1,4 @@
-package ru.papapers.views.subjectrelations;
+package ru.papapers.optimalchoice.ui.views.subjectrelations;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.Text;

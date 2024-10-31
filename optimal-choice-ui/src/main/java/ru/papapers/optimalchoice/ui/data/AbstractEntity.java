@@ -1,4 +1,4 @@
-package ru.papapers.data;
+package ru.papapers.optimalchoice.ui.data;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

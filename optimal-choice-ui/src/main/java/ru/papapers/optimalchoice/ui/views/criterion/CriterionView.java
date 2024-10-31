@@ -1,4 +1,4 @@
-package ru.papapers.views.subjects;
+package ru.papapers.optimalchoice.ui.views.criterion;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,32 +17,36 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import ru.papapers.data.SamplePerson;
-import ru.papapers.services.SamplePersonService;
+import ru.papapers.optimalchoice.ui.data.SamplePerson;
+import ru.papapers.optimalchoice.ui.services.SamplePersonService;
 
-@PageTitle("Subjects")
-@Route("subjects")
-@Menu(order = 3, icon = "line-awesome/svg/pencil-ruler-solid.svg")
+@PageTitle("Criterion")
+@Route("criterion")
+@Menu(order = 1, icon = "line-awesome/svg/pencil-ruler-solid.svg")
 @Uses(Icon.class)
-public class SubjectsView extends Composite<VerticalLayout> {
+public class CriterionView extends Composite<VerticalLayout> {
 
-    public SubjectsView() {
+    public CriterionView() {
         H2 h2 = new H2();
         TextField textField = new TextField();
         Button buttonPrimary = new Button();
+        Paragraph textSmall = new Paragraph();
         Grid basicGrid = new Grid(SamplePerson.class);
         Button buttonSecondary = new Button();
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
-        h2.setText("Какие объекты сравниваем?");
+        h2.setText("Какие параметры объекта?");
         getContent().setAlignSelf(FlexComponent.Alignment.CENTER, h2);
         h2.setWidth("max-content");
-        textField.setLabel(
-                "Добавьте наименования объектов, которые планируете сравнивать. Например, \"Невский, 31\", \"Ленина, 19/17\"");
+        textField.setLabel("Дабавьте параметры (критерии) объекта");
+        getContent().setAlignSelf(FlexComponent.Alignment.START, textField);
         textField.setWidth("100%");
         buttonPrimary.setText("Добавить");
         buttonPrimary.setWidth("100%");
         buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        textSmall.setText("Например, для квартиры параметрами могут быть цена, площадь, район и т.п.");
+        textSmall.setWidth("100%");
+        textSmall.getStyle().set("font-size", "var(--lumo-font-size-xs)");
         basicGrid.setWidth("100%");
         basicGrid.getStyle().set("flex-grow", "0");
         setGridSampleData(basicGrid);
@@ -51,6 +56,7 @@ public class SubjectsView extends Composite<VerticalLayout> {
         getContent().add(h2);
         getContent().add(textField);
         getContent().add(buttonPrimary);
+        getContent().add(textSmall);
         getContent().add(basicGrid);
         getContent().add(buttonSecondary);
     }

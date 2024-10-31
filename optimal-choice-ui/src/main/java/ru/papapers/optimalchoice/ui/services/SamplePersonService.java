@@ -1,12 +1,12 @@
-package ru.papapers.services;
+package ru.papapers.optimalchoice.ui.services;
 
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.papapers.data.SamplePerson;
-import ru.papapers.data.SamplePersonRepository;
+import ru.papapers.optimalchoice.ui.data.SamplePerson;
+import ru.papapers.optimalchoice.ui.data.SamplePersonRepository;
 
 @Service
 public class SamplePersonService {
