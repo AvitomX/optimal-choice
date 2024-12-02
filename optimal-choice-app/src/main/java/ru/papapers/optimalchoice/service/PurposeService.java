@@ -21,14 +21,17 @@ public class PurposeService {
     private final PurposeRepository purposeRepository;
     private final CriterionRelationService criterionRelationService;
     private final SubjectRelationService subjectRelationService;
+    private final CriterionService criterionService;
 
     @Autowired
     public PurposeService(PurposeRepository purposeRepository,
                           CriterionRelationService criterionRelationService,
-                          SubjectRelationService subjectRelationService) {
+                          SubjectRelationService subjectRelationService,
+                          CriterionService criterionService) {
         this.purposeRepository = purposeRepository;
         this.criterionRelationService = criterionRelationService;
         this.subjectRelationService = subjectRelationService;
+        this.criterionService = criterionService;
     }
 
     @Transactional
@@ -37,6 +40,7 @@ public class PurposeService {
 
         Purpose purpose = new Purpose();
         purpose.setName(purposeDto.getName());
+        purpose.setCriteria(criterionService.add(purposeDto.getCriteria()));
         Purpose purposeFromDB = purposeRepository.save(purpose);
 
         List<CriterionRelation> criterionRelationsFromDB = criterionRelationService.add(purposeDto.getCriterionRelations(), purposeFromDB);
@@ -101,5 +105,20 @@ public class PurposeService {
     public void delete(UUID id) {
         purposeRepository.deleteById(id);
         log.info("Purpose was deleted. purposeId: {}", id);
+    }
+
+    @Transactional
+    public Purpose addCriteria(Criterion criterion, UUID purposeId) {
+        Purpose purpose = getOne(purposeId);
+        purpose.getCriteria().add(criterion);
+        return purposeRepository.save(purpose);
+    }
+
+    @Transactional
+    public UUID removeCriterion(UUID id, UUID criterionId) {
+        Purpose purpose = getOne(id);
+        purpose.getCriteria().removeIf(e -> criterionId.equals(e.getId()));
+
+        return criterionId;
     }
 }
