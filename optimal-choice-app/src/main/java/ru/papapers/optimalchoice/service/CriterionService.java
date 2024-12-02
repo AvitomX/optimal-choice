@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.papapers.optimalchoice.api.domain.CriterionDto;
 import ru.papapers.optimalchoice.api.domain.errors.CriterionError;
 import ru.papapers.optimalchoice.api.domain.errors.ErrorCode;
 import ru.papapers.optimalchoice.mapper.CriterionMapper;
@@ -11,6 +12,8 @@ import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.repository.CriterionRepository;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -49,5 +52,16 @@ public class CriterionService {
         log.error("{}", criterionError);
 
         return criterionError;
+    }
+
+    @Transactional
+    public Set<Criterion> add(Set<CriterionDto> criteriaDto) {
+        if (criteriaDto == null || criteriaDto.isEmpty()) {
+            return null;
+        }
+
+        Set<Criterion> criteria = criteriaDto.stream().map(mapper::mapToEntity).collect(Collectors.toSet());
+        log.info("Adding new criteria. Amount: {}", criteria.size());
+        return criterionRepository.saveAll(criteria).stream().collect(Collectors.toSet());
     }
 }

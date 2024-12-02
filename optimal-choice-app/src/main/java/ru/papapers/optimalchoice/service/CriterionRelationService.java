@@ -11,7 +11,6 @@ import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.model.CriterionRelation;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.repository.CriterionRelationRepository;
-import ru.papapers.optimalchoice.api.domain.errors.ErrorCode;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.*;

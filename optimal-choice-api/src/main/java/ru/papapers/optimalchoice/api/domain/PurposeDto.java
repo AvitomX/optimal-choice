@@ -15,6 +15,10 @@ public class PurposeDto implements Serializable {
     @NotBlank
     private String name;
 
+    private Set<CriterionDto> criteria;
+
+    private Set<SubjectDto> subjects;
+
     private Set<CriterionRelationDto> criterionRelations;
 
     private Set<SubjectRelationDto> subjectRelations;

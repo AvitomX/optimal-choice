@@ -19,11 +19,23 @@ import java.util.UUID;
 @NamedEntityGraph(
         name = "purpose-entity-graph",
         attributeNodes = {
+                @NamedAttributeNode(value = "criteria", subgraph = "criteria-subgraph"),
+                @NamedAttributeNode(value = "subjects", subgraph = "subjects-subgraph"),
                 @NamedAttributeNode(value = "criterionRelations", subgraph = "criterion-relations-subgraph"),
                 @NamedAttributeNode(value = "subjectRelations", subgraph = "subject-relations-subgraph")
         },
         subgraphs = {
                 @NamedSubgraph(
+                        name = "criteria-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("name")
+                        }
+                ),                @NamedSubgraph(
+                        name = "subjects-subgraph",
+                        attributeNodes = {
+                                @NamedAttributeNode("name")
+                        }
+                ),                @NamedSubgraph(
                         name = "criterion-relations-subgraph",
                         attributeNodes = {
                                 @NamedAttributeNode("criterion"),
@@ -57,6 +69,12 @@ public class Purpose {
     private UUID id;
 
     private String name;
+
+    @OneToMany
+    private Set<Criterion> criteria = new HashSet<>();
+
+    @OneToMany
+    private Set<Subject> subjects = new HashSet<>();
 
     @OneToMany(mappedBy="purpose", cascade = CascadeType.ALL)
     private Set<CriterionRelation> criterionRelations = new HashSet<>();

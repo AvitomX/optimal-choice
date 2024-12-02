@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.papapers.optimalchoice.api.domain.PurposeDto;
+import ru.papapers.optimalchoice.mapper.CriterionMapper;
 import ru.papapers.optimalchoice.mapper.PurposeMapper;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.service.PurposeService;
@@ -18,14 +19,18 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/purpose")
 public class PurposeController {
+
     private final PurposeService purposeService;
     private final PurposeMapper purposeMapper;
+    private final CriterionMapper criterionMapper;
 
     @Autowired
     public PurposeController(PurposeService purposeService,
-                             PurposeMapper purposeMapper) {
+                             PurposeMapper purposeMapper,
+                             CriterionMapper criterionMapper) {
         this.purposeService = purposeService;
         this.purposeMapper = purposeMapper;
+        this.criterionMapper = criterionMapper;
     }
 
 
