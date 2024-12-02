@@ -7,9 +7,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import lombok.extern.slf4j.Slf4j;
 import ru.papapers.optimalchoice.api.domain.PurposeDto;
+import ru.papapers.optimalchoice.ui.services.PurposeService;
 import ru.papapers.optimalchoice.ui.views.criterion.CriterionView;
 
 import java.util.UUID;
@@ -23,7 +25,11 @@ public class PurposeView extends Composite<VerticalLayout> {
 
     PurposeForm purposeForm;
 
-    public PurposeView() {
+    private final PurposeService purposeService;
+
+    public PurposeView(PurposeService purposeService) {
+        this.purposeService = purposeService;
+
         purposeForm = new PurposeForm();
         purposeForm.addListener(PurposeForm.SaveEvent.class, this::savePurpose);
         PurposeDto purposeDto = new PurposeDto();
@@ -45,6 +51,11 @@ public class PurposeView extends Composite<VerticalLayout> {
     private void savePurpose(PurposeForm.SaveEvent event) {
         PurposeDto purposeDto = event.getPurposeDto();
         log.info(purposeDto.toString());
-        this.getUI().ifPresent(ui -> ui.navigate(CriterionView.class));
+        PurposeDto response = purposeService.save(purposeDto);
+        purposeDto.setId(response.getId());
+        purposeDto.setCriterionRelations(response.getCriterionRelations());
+        purposeDto.setSubjectRelations(response.getSubjectRelations());
+
+        this.getUI().ifPresent(ui -> ui.navigate(CriterionView.class, new RouteParameters("purposeId", purposeDto.getId().toString())));
     }
 }
