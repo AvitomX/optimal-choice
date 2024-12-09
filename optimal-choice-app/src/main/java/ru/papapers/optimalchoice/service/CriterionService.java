@@ -10,9 +10,12 @@ import ru.papapers.optimalchoice.api.domain.errors.ErrorCode;
 import ru.papapers.optimalchoice.mapper.CriterionMapper;
 import ru.papapers.optimalchoice.model.Criterion;
 import ru.papapers.optimalchoice.repository.CriterionRepository;
+import ru.papapers.optimalchoice.repository.PurposeRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,11 +24,15 @@ public class CriterionService {
 
     private final CriterionRepository criterionRepository;
     private final CriterionMapper mapper;
+    private final PurposeRepository purposeRepository;
 
     @Autowired
-    public CriterionService(CriterionRepository criterionRepository, CriterionMapper mapper) {
+    public CriterionService(CriterionRepository criterionRepository,
+                            CriterionMapper mapper,
+                            PurposeRepository purposeRepository) {
         this.criterionRepository = criterionRepository;
         this.mapper = mapper;
+        this.purposeRepository = purposeRepository;
     }
 
     @Transactional
@@ -63,5 +70,12 @@ public class CriterionService {
         Set<Criterion> criteria = criteriaDto.stream().map(mapper::mapToEntity).collect(Collectors.toSet());
         log.info("Adding new criteria. Amount: {}", criteria.size());
         return criterionRepository.saveAll(criteria).stream().collect(Collectors.toSet());
+    }
+
+    @Transactional
+    public Set<Criterion> getList(UUID purposeId) {
+        return purposeRepository.findPurposeCriteriaById(purposeId)
+                .orElseThrow(() -> new EntityNotFoundException("Purpose not found with id: " + purposeId))
+                .getCriteria();
     }
 }

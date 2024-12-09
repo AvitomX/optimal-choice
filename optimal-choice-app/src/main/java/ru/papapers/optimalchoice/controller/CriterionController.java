@@ -12,7 +12,9 @@ import ru.papapers.optimalchoice.service.CriterionService;
 import ru.papapers.optimalchoice.service.PurposeService;
 
 import javax.validation.Valid;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -28,6 +30,14 @@ public class CriterionController {
         this.criterionMapper = criterionMapper;
         this.purposeService = purposeService;
         this.criterionService = criterionService;
+    }
+
+    @GetMapping(value = "purpose/{purposeId}/criteria", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Set<CriterionDto>> getListByPurpose(@PathVariable("purposeId") UUID purposeId) {
+        log.info("Request was accepted to get criteria for purpose {}.", purposeId);
+        Set<Criterion> criteria = criterionService.getList(purposeId);
+
+        return new ResponseEntity<>(criteria.stream().map(criterionMapper::mapToDto).collect(Collectors.toSet()), HttpStatus.OK);
     }
 
     @PostMapping(value = "purpose/{purposeId}/criterion", produces = MediaType.APPLICATION_JSON_VALUE)

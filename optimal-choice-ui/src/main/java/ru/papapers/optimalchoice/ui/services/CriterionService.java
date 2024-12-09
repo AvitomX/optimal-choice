@@ -1,10 +1,12 @@
 package ru.papapers.optimalchoice.ui.services;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.papapers.optimalchoice.api.domain.CriterionDto;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -41,6 +43,19 @@ public class CriterionService {
                         .build())
                 .retrieve()
                 .bodyToMono(Void.class)
+                .block();
+    }
+
+    public Set<CriterionDto> getAllByPurpose(UUID purposeId) {
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .pathSegment("purpose")
+                        .pathSegment(purposeId.toString())
+                        .pathSegment("criteria")
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Set<CriterionDto>>() {})
                 .block();
     }
 }

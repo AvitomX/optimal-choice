@@ -13,8 +13,8 @@ import com.vaadin.flow.router.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.papapers.optimalchoice.api.domain.CriterionDto;
 import ru.papapers.optimalchoice.ui.services.CriterionService;
-import ru.papapers.optimalchoice.ui.services.PurposeService;
 
+import java.util.Set;
 import java.util.UUID;
 
 @PageTitle("Критерии")
@@ -27,12 +27,10 @@ public class CriterionView extends Composite<VerticalLayout> implements BeforeEn
     private final Grid criterionBasicGrid = new Grid(CriterionDto.class);
     CriterionForm criterionForm;
 
-    private final PurposeService purposeService;
     private final CriterionService criterionService;
     private String purposeId;
 
-    public CriterionView(PurposeService purposeService, CriterionService criterionService) {
-        this.purposeService = purposeService;
+    public CriterionView(CriterionService criterionService) {
         this.criterionService = criterionService;
 
         criterionForm = new CriterionForm(new CriterionDto());
@@ -89,12 +87,14 @@ public class CriterionView extends Composite<VerticalLayout> implements BeforeEn
 
     private void updateGrid(UUID purposeId) {
         criterionBasicGrid.asSingleSelect().clear();
-        criterionBasicGrid.setItems(purposeService.get(purposeId).getCriteria());
+        Set<CriterionDto> criteria = criterionService.getAllByPurpose(purposeId);
+        criterionBasicGrid.setItems(criteria);
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        purposeId = event.getRouteParameters().get("purposeId").get();
+        purposeId = event.getRouteParameters().get("purposeId")
+                .orElseThrow(() -> new NullPointerException("purposeId can't be NULL"));
         updateGrid(UUID.fromString(purposeId));
     }
 }
