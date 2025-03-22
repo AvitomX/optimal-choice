@@ -13,6 +13,7 @@ import com.vaadin.flow.router.*;
 import lombok.extern.slf4j.Slf4j;
 import ru.papapers.optimalchoice.api.domain.CriterionDto;
 import ru.papapers.optimalchoice.ui.services.CriterionService;
+import ru.papapers.optimalchoice.ui.views.criterionrelations.CriterionRelationsView;
 
 import java.util.Set;
 import java.util.UUID;
@@ -24,7 +25,8 @@ import java.util.UUID;
 @Slf4j
 public class CriterionView extends Composite<VerticalLayout> implements BeforeEnterObserver {
 
-    private final Grid criterionBasicGrid = new Grid(CriterionDto.class);
+//    private final Grid<CriterionDto> criterionBasicGrid = new Grid<>(CriterionDto.class, false);
+    private final Grid<CriterionDto> criterionBasicGrid = new Grid<>(CriterionDto.class, true);
     CriterionForm criterionForm;
 
     private final CriterionService criterionService;
@@ -37,6 +39,7 @@ public class CriterionView extends Composite<VerticalLayout> implements BeforeEn
         criterionForm.addListener(CriterionForm.SaveEvent.class, this::save);
         criterionForm.addListener(CriterionForm.DeleteEvent.class, this::delete);
 
+//        criterionBasicGrid.addColumn(CriterionDto::getName).setHeader("Наименование");
         criterionBasicGrid.setWidth("100%");
         criterionBasicGrid.getStyle().set("flex-grow", "0");
         criterionBasicGrid.asSingleSelect().addValueChangeListener(event -> editCriterion((CriterionDto) event.getValue()));
@@ -52,10 +55,11 @@ public class CriterionView extends Composite<VerticalLayout> implements BeforeEn
         textSmall.setWidth("100%");
         textSmall.getStyle().set("font-size", "var(--lumo-font-size-xs)");
 
-        Button buttonSecondary = new Button();
-        buttonSecondary.setText("Далее");
-        getContent().setAlignSelf(FlexComponent.Alignment.END, buttonSecondary);
-        buttonSecondary.setWidth("min-content");
+        Button buttonNext = new Button();
+        buttonNext.setText("Далее");
+        getContent().setAlignSelf(FlexComponent.Alignment.END, buttonNext);
+        buttonNext.setWidth("min-content");
+        buttonNext.addClickListener(event -> nextView());
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -64,7 +68,11 @@ public class CriterionView extends Composite<VerticalLayout> implements BeforeEn
         getContent().add(criterionForm);
         getContent().add(textSmall);
         getContent().add(criterionBasicGrid);
-        getContent().add(buttonSecondary);
+        getContent().add(buttonNext);
+    }
+
+    private void nextView() {
+        this.getUI().ifPresent(ui -> ui.navigate(CriterionRelationsView.class, new RouteParameters("purposeId", purposeId)));
     }
 
     private void save(CriterionForm.SaveEvent event) {
