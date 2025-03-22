@@ -42,7 +42,7 @@ public class ResultService {
     }
 
     public Result compute(UUID purposeId) {
-        log.info("Сalculation of results has begun. purposeId: {}", purposeId);
+        log.info("Calculation of results has begun. purposeId: {}", purposeId);
         Purpose purpose = purposeService.getOne(purposeId);
 
         List<Object> errors = purposeService.check(purpose);
@@ -79,7 +79,7 @@ public class ResultService {
     }
 
     private Map<Criterion, Vector> getCriterionVectors(Purpose purpose, List<Object> errors) {
-        log.info("Сalculation of criterion vectors. purposeId: {}", purpose.getId());
+        log.info("Calculation of criterion vectors. purposeId: {}", purpose.getId());
         Set<CriterionRelation> criterionRelations = purpose.getCriterionRelations();
         Set<Criterion> purposeCriteria = Collections.unmodifiableSet(purposeService.getPurposeCriteria(purpose));
         Map<Criterion, Vector> criterionVectorMap = new HashMap<>();
@@ -119,7 +119,7 @@ public class ResultService {
     private Map<Subject, Set<Pair<Criterion, BigDecimal>>> getSubjectVectors(Purpose purpose,
                                                                              Map<Criterion, Vector> criterionVectorMap,
                                                                              List<Object> errors) {
-        log.info("Сalculation of subject vectors. purposeId: {}", purpose.getId());
+        log.info("Calculation of subject vectors. purposeId: {}", purpose.getId());
         Set<Subject> purposeSubject = Collections.unmodifiableSet(purposeService.getPurposeSubject(purpose));
         Map<Criterion, List<SubjectRelation>> criterionListMap = purpose.getSubjectRelations().stream()
                 .collect(groupingBy(SubjectRelation::getCriterion));

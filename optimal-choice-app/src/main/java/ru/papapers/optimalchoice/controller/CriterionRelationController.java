@@ -14,11 +14,14 @@ import ru.papapers.optimalchoice.service.CriterionRelationService;
 import ru.papapers.optimalchoice.service.PurposeService;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/criterion-relation")
+//TODO @RequestMapping("/criterion-relation")
 public class CriterionRelationController {
     private final CriterionRelationService criterionRelationService;
     private final CriterionRelationMapper mapper;
@@ -45,6 +48,19 @@ public class CriterionRelationController {
         return new ResponseEntity<>(mapper.mapToDto(criterionRelation), HttpStatus.CREATED);
     }
 
+    @PostMapping(value = "purpose/{purposeId}/criterion-relations", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Set<CriterionRelationDto>> create(@PathVariable("purposeId") UUID purposeId,
+                                                            @Valid @RequestBody Set<CriterionRelationDto> criterionRelationsDto) {
+        log.info("Request for creation of {} new criterion relations for purpose {} was accepted.",
+                criterionRelationsDto.size(), purposeId);
+
+        Purpose purpose = purposeService.getOne(purposeId);
+        List<CriterionRelation> criterionRelations = criterionRelationService.add(criterionRelationsDto, purpose);
+
+        return new ResponseEntity<>(criterionRelations.stream().map(mapper::mapToDto).collect(Collectors.toSet()),
+                HttpStatus.CREATED);
+    }
+
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CriterionRelationDto> update(@Valid @RequestBody CriterionRelationDto criterionRelationDto) {
         log.info("Request for modification of criterion relation was accepted.");
@@ -55,8 +71,8 @@ public class CriterionRelationController {
 
     @DeleteMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UUID> delete(@PathVariable("id") UUID id) {
-        criterionRelationService.delete(id);
         log.info("Request for criterion relation deleting with id: {} was accepted.", id);
+        criterionRelationService.delete(id);
 
         return new ResponseEntity<>(id, HttpStatus.OK);
     }

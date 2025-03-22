@@ -22,15 +22,12 @@ public class PurposeController {
 
     private final PurposeService purposeService;
     private final PurposeMapper purposeMapper;
-    private final CriterionMapper criterionMapper;
 
     @Autowired
     public PurposeController(PurposeService purposeService,
-                             PurposeMapper purposeMapper,
-                             CriterionMapper criterionMapper) {
+                             PurposeMapper purposeMapper) {
         this.purposeService = purposeService;
         this.purposeMapper = purposeMapper;
-        this.criterionMapper = criterionMapper;
     }
 
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.papapers.optimalchoice.api.domain.CriterionDto;
 import ru.papapers.optimalchoice.mapper.CriterionMapper;
 import ru.papapers.optimalchoice.model.Criterion;
+import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.service.CriterionService;
 import ru.papapers.optimalchoice.service.PurposeService;
 
@@ -45,9 +46,28 @@ public class CriterionController {
                                                      @PathVariable("purposeId") UUID purposeId) {
         log.info("Request was accepted to add criterion {} for purpose {}.", criterionDto, purposeId);
         Criterion criterion = criterionService.add(criterionMapper.mapToEntity(criterionDto));
-        purposeService.addCriteria(criterion, purposeId);
+        purposeService.addCriterion(criterion, purposeId);
 
         return new ResponseEntity<>(criterionMapper.mapToDto(criterion), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "purpose/{purposeId}/criteria", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Set<CriterionDto>> addCriteria(@Valid @RequestBody Set<CriterionDto> criteriaDto,
+                                                          @PathVariable("purposeId") UUID purposeId) {
+        log.info("Request was accepted to add {} criteria for purpose {}.", criteriaDto.size(), purposeId);
+        Set<Criterion> criteriaFromDB = criteriaDto.stream()
+                .map(criterionMapper::mapToEntity)
+                .map(criterionService::add)
+                .collect(Collectors.toSet());
+
+        Purpose purpose = purposeService.updateCriteria(criteriaFromDB, purposeId);
+
+
+        return new ResponseEntity<>(
+                purpose.getCriteria().stream()
+                        .map(criterionMapper::mapToDto)
+                        .collect(Collectors.toSet()),
+                HttpStatus.OK);
     }
 
     @DeleteMapping(value = "purpose/{purposeId}/criterion/{id}", produces = MediaType.ALL_VALUE)

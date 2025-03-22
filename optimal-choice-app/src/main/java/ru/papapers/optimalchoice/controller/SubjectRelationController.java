@@ -7,15 +7,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import ru.papapers.optimalchoice.api.domain.CriterionRelationDto;
 import ru.papapers.optimalchoice.api.domain.SubjectRelationDto;
 import ru.papapers.optimalchoice.mapper.SubjectRelationMapper;
+import ru.papapers.optimalchoice.model.CriterionRelation;
 import ru.papapers.optimalchoice.model.Purpose;
 import ru.papapers.optimalchoice.model.SubjectRelation;
 import ru.papapers.optimalchoice.service.PurposeService;
 import ru.papapers.optimalchoice.service.SubjectRelationService;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -43,6 +48,19 @@ public class SubjectRelationController {
         SubjectRelation subjectRelation = subjectRelationService.addOne(subjectRelationDto, purpose);
 
         return new ResponseEntity<>(mapper.mapToDto(subjectRelation), HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "purpose/{purposeId}/subject-relations", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Set<SubjectRelationDto>> create(@PathVariable("purposeId") UUID purposeId,
+                                                            @Valid @RequestBody Set<SubjectRelationDto> subjectRelationDtos) {
+        log.info("Request for creation of {} new subject relations for purpose {} was accepted.",
+                subjectRelationDtos.size(), purposeId);
+
+        Purpose purpose = purposeService.getOne(purposeId);
+        List<SubjectRelation> subjectRelations = subjectRelationService.add(subjectRelationDtos, purpose);
+
+        return new ResponseEntity<>(subjectRelations.stream().map(mapper::mapToDto).collect(Collectors.toSet()),
+                HttpStatus.CREATED);
     }
 
     @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)

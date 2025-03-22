@@ -108,7 +108,7 @@ public class PurposeService {
     }
 
     @Transactional
-    public Purpose addCriteria(Criterion criterion, UUID purposeId) {
+    public Purpose addCriterion(Criterion criterion, UUID purposeId) {
         Purpose purpose = getOne(purposeId);
         purpose.getCriteria().add(criterion);
         return purposeRepository.save(purpose);
@@ -120,5 +120,19 @@ public class PurposeService {
         purpose.getCriteria().removeIf(e -> criterionId.equals(e.getId()));
 
         return criterionId;
+    }
+
+    @Transactional
+    public Purpose updateCriteria(Set<Criterion> criteria, UUID purposeId) {
+        Purpose purpose = getOne(purposeId);
+        purpose.setCriteria(criteria);
+        return purposeRepository.save(purpose);
+    }
+
+    @Transactional
+    public Purpose updateSubjects(Set<Subject> subjects, UUID purposeId) {
+        Purpose purpose = getOne(purposeId);
+        purpose.setSubjects(subjects);
+        return purposeRepository.save(purpose);
     }
 }
