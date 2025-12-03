@@ -26,7 +26,7 @@ public class Subject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Type(type = "uuid-char")
+    @Type(type = "pg-uuid")
     private UUID id;
 
     @Column(unique = true, nullable = false)

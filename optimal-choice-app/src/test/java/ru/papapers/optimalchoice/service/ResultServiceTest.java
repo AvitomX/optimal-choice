@@ -26,7 +26,7 @@ import static org.mockito.Mockito.doReturn;
 class ResultServiceTest {
 
     @Spy
-    private PurposeService purposeService = new PurposeService(null, null, null);
+    private PurposeService purposeService = new PurposeService(null, null, null, null);
 
     @Spy
     private CriterionMapperImpl criterionMapper;

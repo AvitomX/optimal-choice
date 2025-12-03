@@ -28,7 +28,7 @@ public class SubjectRelation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Type(type = "uuid-char")
+    @Type(type = "pg-uuid")
     private UUID id;
 
     @ManyToOne
