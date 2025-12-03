@@ -5,35 +5,40 @@ spring:
   application:
     name: optimal-choice-app
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:file:./opttestdb_v2
-    username: sa
-    password: my-psw
+    driverClassName: org.postgresql.Driver
+#    url: jdbc:h2:file:./opttestdb_v2
+    url: jdbc:postgresql://localhost:5432/postgres
+#    username: sa
+    username: postgres
+#    password: my-psw
+    password: qazwsx321
   jpa:
     open-in-view: false
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
+        default_schema: optch
         max_fetch_depth: 3
         order_inserts: true
         order_updates: true
-        generate_statistics: true
-        format_sql: true
+#        generate_statistics: true
+#        format_sql: true
     hibernate:
       jdbc:
         lob:
           non_contextual_creation: true
-          ddl-auto: update
-    show-sql: true
+#          ddl-auto: update
+          ddl-auto: validate
+#    show-sql: true
     generate-ddl: true
-  h2:
-    console.enabled: true
+#  h2:
+#    console.enabled: true
 
-logging:
-  level:
-    org:
-      hibernate:
-        stat: DEBUG
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        stat: DEBUG
 
 
 springdoc:

@@ -1,0 +1,27 @@
+{
+  "name": "optimal-choice-ui",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "node --no-warnings ./node_modules/.bin/vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.2.96",
+    "echarts": "^5.6.0",
+    "vue": "^3.3.4",
+    "vue-echarts": "^7.0.3",
+    "vue-router": "^4.2.0",
+    "vuetify": "^3.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/compiler-sfc": "^3.3.4",
+    "vite": "^4.3.9"
+  }
+}
