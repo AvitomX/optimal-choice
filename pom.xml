@@ -20,7 +20,6 @@
 	<modules>
 		<module>optimal-choice-api</module>
 		<module>optimal-choice-app</module>
-        <module>optimal-choice-ui</module>
     </modules>
 
 </project>
