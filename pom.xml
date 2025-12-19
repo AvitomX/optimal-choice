@@ -13,13 +13,13 @@
 	<description>Многокритериальная оптимизация</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<modules>
 		<module>optimal-choice-api</module>
 		<module>optimal-choice-app</module>
-	</modules>
+    </modules>
 
 </project>
