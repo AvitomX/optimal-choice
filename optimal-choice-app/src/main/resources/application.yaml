@@ -1,5 +1,7 @@
 server:
   port: 8090
+  servlet:
+    context-path: /api
 
 spring:
   application:
@@ -34,6 +36,15 @@ spring:
 springdoc:
   api-docs:
     enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
 
 ---
 spring:

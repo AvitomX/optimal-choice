@@ -1,0 +1,43 @@
+# Многоэтапная сборка для оптимизации размера образа
+FROM maven:3.8.6-eclipse-temurin-17 AS build
+
+WORKDIR /app
+
+# Копирование файлов pom.xml для кэширования зависимостей
+COPY pom.xml .
+COPY optimal-choice-api/pom.xml ./optimal-choice-api/
+COPY optimal-choice-app/pom.xml ./optimal-choice-app/
+
+# Загрузка зависимостей (кэшируется если pom.xml не изменился)
+RUN mvn dependency:go-offline -B
+
+# Копирование исходного кода
+COPY optimal-choice-api/src ./optimal-choice-api/src
+COPY optimal-choice-app/src ./optimal-choice-app/src
+
+# Сборка приложения
+RUN mvn clean package -DskipTests -B
+
+# Финальный образ
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+# Создание непривилегированного пользователя
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+# Копирование JAR файла из этапа сборки
+COPY --from=build /app/optimal-choice-app/target/*.jar app.jar
+
+# Переменные окружения
+ENV JAVA_OPTS="-Xmx512m -Xms256m" \
+    SPRING_PROFILES_ACTIVE=prod
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8090/api/actuator/health || exit 1
+
+EXPOSE 8090
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
